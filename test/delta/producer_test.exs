@@ -20,13 +20,13 @@ defmodule Delta.ProducerTest do
       url = response_expectation([{200, "1"}, {304, ""}, {200, "2"}])
 
       assert [%Delta.File{body: "1"}, %Delta.File{body: "2"}] =
-               take_files(2, url: url, frequency: 0)
+               take_files(2, url: url, frequency: 0, filters: [])
     end
 
     @tag :capture_log
     test "refetches after an error" do
       url = response_expectation([{500, ""}, {200, "1"}])
-      assert [%Delta.File{body: "1"}] = take_files(1, url: url, frequency: 0)
+      assert [%Delta.File{body: "1"}] = take_files(1, url: url, frequency: 0, filters: [])
     end
 
     test "does not fetch more than demanded" do
@@ -35,6 +35,11 @@ defmodule Delta.ProducerTest do
       url = "http://127.0.0.1:#{bypass.port}"
       {:ok, pid} = Producer.start_link(url: url, frequency: 0)
       assert [%Delta.File{}] = Enum.take(GenStage.stream([{pid, max_demand: 1}]), 1)
+    end
+
+    test "by default, always gzip-encodes the files" do
+      url = response_expectation([{200, ""}])
+      assert [%Delta.File{encoding: :gzip}] = take_files(1, url: url)
     end
   end
 

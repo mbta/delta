@@ -2,14 +2,20 @@ defmodule Delta.Producer do
   @moduledoc """
   GenStage which fulfills demand by making HTTP requests on a configurable frequency.
   """
+  alias Delta.File
+  use GenStage
+  require Logger
+
   @type opts :: [opt]
-  @type opt :: {:url, binary} | {:frequency, non_neg_integer} | {:http_mod, module}
+  @type opt ::
+          {:url, binary}
+          | {:frequency, non_neg_integer}
+          | {:http_mod, module}
+          | {:filters, [filter]}
+  @type filter :: (File.t() -> File.t())
 
   @default_frequency 60_000
   @default_http_mod Delta.Producer.Hackney
-
-  use GenStage
-  require Logger
 
   @start_link_opts [:name]
 
@@ -18,18 +24,20 @@ defmodule Delta.Producer do
     GenStage.start_link(__MODULE__, opts, Keyword.take(opts, @start_link_opts))
   end
 
-  defstruct [:conn, :http_mod, :frequency, :last_fetched, :ref, headers: [], demand: 0]
+  defstruct [:conn, :http_mod, :frequency, :filters, :last_fetched, :ref, headers: [], demand: 0]
 
   @impl GenStage
   def init(opts) do
     url = Keyword.get(opts, :url)
     frequency = Keyword.get(opts, :frequency, @default_frequency)
     http_mod = Keyword.get(opts, :http_mod, @default_http_mod)
+    filters = Keyword.get(opts, :filters, [&File.ensure_gzipped/1])
     {:ok, conn} = http_mod.new(url)
 
     state = %__MODULE__{
       conn: conn,
       http_mod: http_mod,
+      filters: filters,
       frequency: frequency,
       last_fetched: monotonic_now() - frequency - 1
     }
@@ -70,6 +78,7 @@ defmodule Delta.Producer do
   end
 
   defp handle_file(state, file) do
+    file = apply_filters(file, state.filters)
     state = %{state | demand: max(state.demand - 1, 0)}
     {:noreply, [file], state}
   end
@@ -91,5 +100,15 @@ defmodule Delta.Producer do
 
   defp monotonic_now do
     System.monotonic_time(:millisecond)
+  end
+
+  @spec apply_filters(File.t(), [filter]) :: File.t()
+  defp apply_filters(%File{} = file, [filter | rest]) do
+    %File{} = file = filter.(file)
+    apply_filters(file, rest)
+  end
+
+  defp apply_filters(%File{} = file, []) do
+    file
   end
 end
