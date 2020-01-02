@@ -24,9 +24,7 @@ defmodule Delta.Producer.Hackney do
   def fetch(conn) do
     case :hackney.request(:get, conn.url, conn.headers, [], @hackney_opts) do
       {:ok, 200, headers, ref} ->
-        conn = update_cache_headers(conn, headers)
-        {:ok, body} = :hackney.body(ref)
-        {:ok, conn, build_file(conn, headers, body)}
+        maybe_file(conn, headers, ref)
 
       {:ok, 304, headers, ref} ->
         _ = :hackney.body(ref)
@@ -40,6 +38,25 @@ defmodule Delta.Producer.Hackney do
       {:error, reason} ->
         {:error, conn, reason}
     end
+  end
+
+  defp maybe_file(conn, headers, ref) do
+    new_conn = update_cache_headers(conn, headers)
+
+    if modified_cache_headers?(new_conn.headers, conn.headers) do
+      {:ok, body} = :hackney.body(ref)
+      {:ok, new_conn, build_file(new_conn, headers, body)}
+    else
+      _ = :hackney.body(ref)
+      {:unmodified, new_conn}
+    end
+  end
+
+  defp modified_cache_headers?(new_headers, old_headers) do
+    # only check if the ETag header changed. We don't consider the
+    # Last-Modified time (accurate to the second) good enoough.
+    List.keyfind(new_headers, "if-none-match", 0, :new) !=
+      List.keyfind(old_headers, "if-none-match", 0, :old)
   end
 
   defp build_file(state, headers, body) do

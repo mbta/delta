@@ -67,6 +67,20 @@ defmodule Delta.Producer.HackneyTest do
       assert {:unmodified, _conn} = Hackney.fetch(conn)
     end
 
+    test "returns :unmodified if the etag hasn't changed, even with a 200", %{
+      bypass: bypass,
+      conn: conn
+    } do
+      Bypass.expect(bypass, fn conn ->
+        conn
+        |> put_resp_header("etag", "etag")
+        |> send_resp(200, "")
+      end)
+
+      {:ok, conn, _file} = Hackney.fetch(conn)
+      assert {:unmodified, _conn} = Hackney.fetch(conn)
+    end
+
     test "returns an error with an invalid response", %{bypass: bypass, conn: conn} do
       Bypass.expect_once(bypass, fn conn -> send_resp(conn, 500, "") end)
       assert {:error, _conn, {:invalid_status, 500, _}} = Hackney.fetch(conn)
