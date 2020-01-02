@@ -1,0 +1,8 @@
+/deps
+/_build
+/Dockerfile
+/.git
+/config/*.local.exs
+/aws
+/cover
+*~
