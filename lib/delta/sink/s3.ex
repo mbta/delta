@@ -6,10 +6,12 @@ defmodule Delta.Sink.S3 do
   alias ExAws.S3
   require Logger
 
-  def start_link(config, file) do
-    Task.start_link(__MODULE__, :upload_to_s3, [config, file])
+  @spec start_link(Keyword.t(), File.t()) :: GenServer.on_start()
+  def start_link(config, %File{} = file) when is_list(config) do
+    Task.start_link(__MODULE__, :upload_to_s3, [Map.new(config), file])
   end
 
+  @spec upload_to_s3(map, File.t()) :: :ok
   def upload_to_s3(config, file) do
     ex_aws = Map.get(config, :ex_aws, ExAws)
     full_filename = Path.join(config.prefix, build_filename(file))

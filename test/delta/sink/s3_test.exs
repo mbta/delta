@@ -27,7 +27,7 @@ defmodule Delta.Sink.S3Test do
 
   describe "start_link/1" do
     test "returns a pid" do
-      assert {:ok, pid} = S3.start_link(@config, @sample_file)
+      assert {:ok, pid} = S3.start_link(Map.to_list(@config), @sample_file)
       assert is_pid(pid)
     end
   end
