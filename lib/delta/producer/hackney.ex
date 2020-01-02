@@ -82,7 +82,7 @@ defmodule Delta.Producer.Hackney do
   end
 
   defp store_header(headers, key, value) do
-    List.keystore(headers, key, 1, {key, value})
+    List.keystore(headers, key, 0, {key, value})
   end
 
   defp best_datetime(headers) do

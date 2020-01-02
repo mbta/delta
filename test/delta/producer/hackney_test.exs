@@ -51,11 +51,19 @@ defmodule Delta.Producer.HackneyTest do
 
           ["etag"] ->
             assert get_req_header(conn, "if-modified-since") == [today]
+
+            conn
+            |> put_resp_header("etag", "etag2")
+            |> send_resp(304, "")
+
+          ["etag2"] ->
+            assert get_req_header(conn, "if-modified-since") == [today]
             send_resp(conn, 304, "")
         end
       end)
 
       {:ok, conn, _file} = Hackney.fetch(conn)
+      assert {:unmodified, conn} = Hackney.fetch(conn)
       assert {:unmodified, _conn} = Hackney.fetch(conn)
     end
 
