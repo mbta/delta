@@ -43,7 +43,8 @@ defmodule Delta.MixProject do
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
-      {:bypass, "~> 1.0", only: :test}
+      {:bypass, "~> 1.0", only: :test},
+      {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod}
     ]
   end
 end
