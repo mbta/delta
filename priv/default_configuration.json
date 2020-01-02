@@ -1,0 +1,17 @@
+{
+  "sinks": {
+    "log": {
+      "type": "log",
+      "producers": ["vehicle_positions", "trip_updates"]
+    }
+  },
+  "producers": {
+    "vehicle_positions": {
+      "url": "https://cdn.mbta.com/realtime/VehiclePositions.pb",
+      "frequency": 1000
+    },
+    "trip_updates": {
+      "url": "https://cdn.mbta.com/realtime/TripUpdates.pb"
+    }
+  }
+}
