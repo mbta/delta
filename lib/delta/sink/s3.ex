@@ -22,16 +22,12 @@ defmodule Delta.Sink.S3 do
       content_type: content_type(file)
     ]
 
-    config.bucket
-    |> S3.put_object(full_filename, file.body, put_config)
-    |> ex_aws.request!
+    response =
+      config.bucket
+      |> S3.put_object(full_filename, file.body, put_config)
+      |> ex_aws.request
 
-    _ =
-      Logger.info(
-        "#{__MODULE__} uploaded bucket=#{config.bucket} path=#{full_filename} bytes=#{
-          byte_size(file.body)
-        }"
-      )
+    _ = log_response(config, full_filename, file, response)
 
     :ok
   end
@@ -58,4 +54,20 @@ defmodule Delta.Sink.S3 do
   defp do_content_type(".json"), do: "application/json"
   defp do_content_type(".pb"), do: "application/x-protobuf"
   defp do_content_type(_), do: "application/octet-stream"
+
+  defp log_response(config, full_filename, file, {:ok, _}) do
+    Logger.info(
+      "#{__MODULE__} uploaded bucket=#{config.bucket} path=#{full_filename} bytes=#{
+        byte_size(file.body)
+      }"
+    )
+  end
+
+  defp log_response(config, full_filename, file, {:error, reason}) do
+    Logger.warn(
+      "#{__MODULE__} failed to upload bucket=#{config.bucket} path=#{full_filename} bytes=#{
+        byte_size(file.body)
+      } reason=#{inspect(reason)}"
+    )
+  end
 end

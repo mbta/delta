@@ -65,10 +65,27 @@ defmodule Delta.Sink.S3Test do
           S3.upload_to_s3(@config, @sample_file)
         end)
 
+      assert log =~ "uploaded"
       assert log =~ "bucket=fake"
       assert log =~ "path=prefix/2020/"
       # length of "body"
       assert log =~ "bytes=4"
+    end
+
+    test "logs a warning if the S3 upload fails" do
+      config = %{@config | ex_aws: __MODULE__.FakeAwsFailure}
+
+      log =
+        capture_log([level: :warn], fn ->
+          S3.upload_to_s3(config, @sample_file)
+        end)
+
+      assert log =~ "failed to upload"
+      assert log =~ "bucket=fake"
+      assert log =~ "path=prefix/2020/"
+      # length of "body"
+      assert log =~ "bytes=4"
+      assert log =~ "reason=:failure"
     end
   end
 
@@ -78,12 +95,20 @@ defmodule Delta.Sink.S3Test do
       Agent.start_link(fn -> nil end, name: __MODULE__)
     end
 
-    def request!(request) do
+    def request(request) do
       Agent.update(__MODULE__, fn _ -> request end)
+      {:ok, %{"body" => "response"}}
     end
 
     def get do
       Agent.get(__MODULE__, & &1)
+    end
+  end
+
+  defmodule FakeAwsFailure do
+    @moduledoc "Fake AWS implementation which always fails"
+    def request(_request) do
+      {:error, :failure}
     end
   end
 end
