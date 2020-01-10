@@ -41,6 +41,23 @@ defmodule Delta.ProducerTest do
       url = response_expectation([{200, ""}])
       assert [%Delta.File{encoding: :gzip}] = take_files(1, url: url)
     end
+
+    test "can send data to multiple consumers" do
+      url = response_expectation([{200, "1"}, {200, "2"}])
+      {:ok, pid} = Producer.start_link(url: url, frequency: 200, filters: [])
+
+      task_fn = fn ->
+        [pid]
+        |> GenStage.stream()
+        |> Enum.find(fn %{body: body} -> body == "2" end)
+      end
+
+      task_one = Task.async(task_fn)
+      task_two = Task.async(task_fn)
+      result_one = Task.await(task_one, :infinity)
+      result_two = Task.await(task_two, :infinity)
+      assert result_one == result_two
+    end
   end
 
   defp take_files(count, opts) do

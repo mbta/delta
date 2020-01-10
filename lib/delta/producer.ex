@@ -42,7 +42,7 @@ defmodule Delta.Producer do
       last_fetched: monotonic_now() - frequency - 1
     }
 
-    {:producer, state}
+    {:producer, state, dispatcher: GenStage.BroadcastDispatcher}
   end
 
   @impl GenStage
@@ -97,6 +97,15 @@ defmodule Delta.Producer do
     ref = Process.send_after(self(), :fetch, next_fetch_after)
     %{state | ref: ref}
   end
+
+  # coveralls-ignore-start
+  defp schedule_fetch(%{ref: _} = state) do
+    # already scheduled!  this isn't always hit during testing (but it is
+    # sometimes) so we skip the coverage check.
+    state
+  end
+
+  # coveralls-ignore-stop
 
   defp monotonic_now do
     System.monotonic_time(:millisecond)
