@@ -1,7 +1,9 @@
 defmodule Delta.Producer.HackneyTest do
   @moduledoc false
   use ExUnit.Case, async: true
-  import Plug.Conn, only: [send_resp: 3, get_req_header: 2, put_resp_header: 3]
+
+  import Plug.Conn,
+    only: [send_resp: 3, get_req_header: 2, put_resp_header: 3]
 
   alias Delta.Producer.Hackney
 
@@ -95,6 +97,15 @@ defmodule Delta.Producer.HackneyTest do
       assert {:error, _conn, _reason} = Hackney.fetch(conn)
       Bypass.up(bypass)
       assert {:ok, _conn, _file} = Hackney.fetch(conn)
+    end
+  end
+
+  describe "maybe_file_with_body" do
+    test "returns an error when the body cannot be read" do
+      {:ok, conn} = Hackney.new(url: "https://www.mbta.com/")
+
+      assert {:error, ^conn, :timeout} =
+               Hackney.maybe_file_with_body(conn, [], {:error, :timeout})
     end
   end
 end

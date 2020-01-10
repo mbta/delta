@@ -44,8 +44,7 @@ defmodule Delta.Producer.Hackney do
     new_conn = update_cache_headers(conn, headers)
 
     if modified_cache_headers?(new_conn.headers, conn.headers) do
-      {:ok, body} = :hackney.body(ref)
-      {:ok, new_conn, build_file(new_conn, headers, body)}
+      maybe_file_with_body(new_conn, headers, :hackney.body(ref))
     else
       _ = :hackney.body(ref)
       {:unmodified, new_conn}
@@ -57,6 +56,16 @@ defmodule Delta.Producer.Hackney do
     # Last-Modified time (accurate to the second) good enoough.
     List.keyfind(new_headers, "if-none-match", 0, :new) !=
       List.keyfind(old_headers, "if-none-match", 0, :old)
+  end
+
+  @doc false
+  # only public to allow unit testing. I couldn't reproduce this with Bypass. -ps
+  def maybe_file_with_body(conn, headers, {:ok, body}) do
+    {:ok, conn, build_file(conn, headers, body)}
+  end
+
+  def maybe_file_with_body(conn, _headers, {:error, reason}) do
+    {:error, conn, reason}
   end
 
   defp build_file(state, headers, body) do
