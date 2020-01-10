@@ -6,6 +6,7 @@ defmodule Delta.File do
     :updated_at,
     :url,
     :body,
+    content_type: Application.get_env(:delta, :default_content_type),
     encoding: :none
   ]
 
@@ -13,6 +14,7 @@ defmodule Delta.File do
           updated_at: DateTime.t(),
           url: binary,
           body: binary,
+          content_type: binary,
           encoding: encoding
         }
   @type encoding :: :none | :gzip
@@ -26,5 +28,22 @@ defmodule Delta.File do
 
   def ensure_gzipped(%__MODULE__{encoding: :gzip} = file) do
     file
+  end
+
+  @doc "Ensure that the file has a content type"
+  @spec ensure_content_type(t()) :: t()
+  def ensure_content_type(%__MODULE__{content_type: ct} = file) when is_binary(ct) do
+    file
+  end
+
+  def ensure_content_type(%__MODULE__{} = file) do
+    extension = Path.extname(file.url)
+    content_type = content_type_of_extension(extension)
+    %{file | content_type: content_type}
+  end
+
+  defp content_type_of_extension(extension) do
+    types = Application.get_env(:delta, :content_type_extensions)
+    Map.get_lazy(types, extension, fn -> Application.get_env(:delta, :default_content_type) end)
   end
 end
