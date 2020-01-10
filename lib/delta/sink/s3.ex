@@ -47,27 +47,37 @@ defmodule Delta.Sink.S3 do
   defp encoding_suffix(%File{encoding: :gzip}), do: ".gz"
   defp encoding_suffix(%File{}), do: ""
 
-  defp content_type(%File{url: url}) do
-    do_content_type(Path.extname(url))
+  defp content_type(%File{} = file) do
+    if content_type = file.content_type do
+      content_type
+    else
+      Application.get_env(:delta, :default_content_type)
+    end
   end
 
-  defp do_content_type(".json"), do: "application/json"
-  defp do_content_type(".pb"), do: "application/x-protobuf"
-  defp do_content_type(_), do: "application/octet-stream"
+  defp log_response(config, full_filename, file, response) do
+    level =
+      case response do
+        {:ok, _} ->
+          :info
 
-  defp log_response(config, full_filename, file, {:ok, _}) do
-    Logger.info(
-      "#{__MODULE__} uploaded bucket=#{config.bucket} path=#{full_filename} bytes=#{
-        byte_size(file.body)
-      }"
-    )
-  end
+        {:error, _} ->
+          :warn
+      end
 
-  defp log_response(config, full_filename, file, {:error, reason}) do
-    Logger.warn(
-      "#{__MODULE__} failed to upload bucket=#{config.bucket} path=#{full_filename} bytes=#{
-        byte_size(file.body)
-      } reason=#{inspect(reason)}"
-    )
+    Logger.log(level, fn ->
+      response_text =
+        case response do
+          {:ok, _} ->
+            "uploaded"
+
+          {:error, reason} ->
+            "failed to upload reason=#{inspect(reason)}"
+        end
+
+      "#{__MODULE__} #{response_text} bucket=#{config.bucket} path=#{full_filename} content_type=#{
+        inspect(file.content_type)
+      } bytes=#{byte_size(file.body)}"
+    end)
   end
 end

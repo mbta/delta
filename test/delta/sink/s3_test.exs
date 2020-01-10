@@ -16,6 +16,7 @@ defmodule Delta.Sink.S3Test do
   @sample_file %File{
     updated_at: ~U[2020-01-02T03:04:05Z],
     url: "https://cdn.mbta.com/realtime/Alerts.pb",
+    content_type: "application/x-protobuf",
     body: "body",
     encoding: :none
   }
@@ -57,6 +58,13 @@ defmodule Delta.Sink.S3Test do
       request = FakeAws.get()
       assert %{"content-encoding" => "gzip"} = request.headers
       assert request.path =~ "Alerts.pb.gz"
+    end
+
+    @tag :capture_log
+    test "can handle files without a content-type" do
+      :ok = S3.upload_to_s3(@config, %{@sample_file | content_type: nil})
+      request = FakeAws.get()
+      assert %{"content-type" => "application/octet-stream"} = request.headers
     end
 
     test "logs the metadata for the uploaded file" do
