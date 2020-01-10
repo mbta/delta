@@ -2,6 +2,9 @@ use Mix.Config
 
 config :delta,
   default_content_type: "application/octet-stream",
+  compressed_content_types: [
+    "application/zip"
+  ],
   content_type_extensions: %{
     ".json" => "application/json",
     ".pb" => "application/x-protobuf",

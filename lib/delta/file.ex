@@ -10,6 +10,8 @@ defmodule Delta.File do
     encoding: :none
   ]
 
+  @already_compressed_content_types Application.get_env(:delta, :compressed_content_types)
+
   @type t :: %__MODULE__{
           updated_at: DateTime.t(),
           url: binary,
@@ -21,12 +23,13 @@ defmodule Delta.File do
 
   @doc "Ensure that the file is GZip-encoded."
   @spec ensure_gzipped(t()) :: t()
-  def ensure_gzipped(%__MODULE__{encoding: :none} = file) do
+  def ensure_gzipped(%__MODULE__{content_type: ct, encoding: :none} = file)
+      when ct not in @already_compressed_content_types do
     encoded_body = :zlib.gzip(file.body)
     %{file | body: encoded_body, encoding: :gzip}
   end
 
-  def ensure_gzipped(%__MODULE__{encoding: :gzip} = file) do
+  def ensure_gzipped(%__MODULE__{} = file) do
     file
   end
 

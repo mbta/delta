@@ -15,6 +15,11 @@ defmodule Delta.FileTest do
       assert encoded.encoding == :gzip
       assert :zlib.gunzip(encoded.body) == file.body
     end
+
+    test "does not gzip encode a ZIP file" do
+      file = %File{content_type: "application/zip"}
+      assert File.ensure_gzipped(file) == file
+    end
   end
 
   describe "ensure_content_type" do
