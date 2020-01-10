@@ -31,7 +31,7 @@ defmodule Delta.Producer do
     url = Keyword.get(opts, :url)
     frequency = Keyword.get(opts, :frequency, @default_frequency)
     http_mod = Keyword.get(opts, :http_mod, @default_http_mod)
-    filters = Keyword.get(opts, :filters, [&File.ensure_gzipped/1])
+    filters = Keyword.get(opts, :filters, [&File.ensure_content_type/1, &File.ensure_gzipped/1])
     {:ok, conn} = http_mod.new(url)
 
     state = %__MODULE__{
