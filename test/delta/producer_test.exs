@@ -6,9 +6,11 @@ defmodule Delta.ProducerTest do
 
   describe "events" do
     test "returns a %Delta.File{}" do
+      url = response_expectation([{200, "1"}, {200, "2"}])
+
       {time_usec, result} =
         :timer.tc(fn ->
-          take_files(2, url: "https://httpbin.org/uuid", frequency: 500)
+          take_files(2, url: url, frequency: 500)
         end)
 
       assert [%Delta.File{}, %Delta.File{}] = result
