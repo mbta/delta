@@ -7,4 +7,5 @@ defmodule Delta.Producer.HTTP do
   @type t :: term
   @callback new(binary) :: {:ok, t()}
   @callback fetch(t()) :: {:ok, t(), Delta.File.t()} | {:unmodified, t()} | {:error, t(), term}
+  @callback stream(t(), term) :: {:ok, t(), [Delta.File.t()]} | :unknown
 end

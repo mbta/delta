@@ -100,6 +100,18 @@ defmodule Delta.Producer.HackneyTest do
     end
   end
 
+  describe "stream/2" do
+    test "ignores {:ssl_closed, _} messages" do
+      {:ok, conn} = Hackney.new(url: "https://www.mbta.com/")
+      assert {:ok, ^conn, []} = Hackney.stream(conn, {:ssl_closed, :port})
+    end
+
+    test "returns :unknown for any other messages" do
+      {:ok, conn} = Hackney.new(url: "https://www.mbta.com/")
+      assert :unknown = Hackney.stream(conn, :other_message)
+    end
+  end
+
   describe "maybe_file_with_body" do
     test "returns an error when the body cannot be read" do
       {:ok, conn} = Hackney.new(url: "https://www.mbta.com/")

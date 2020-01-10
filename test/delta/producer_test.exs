@@ -1,6 +1,7 @@
 defmodule Delta.ProducerTest do
   @moduledoc false
   use ExUnit.Case, async: true
+  import ExUnit.CaptureLog
 
   alias Delta.Producer
 
@@ -59,6 +60,35 @@ defmodule Delta.ProducerTest do
       result_one = Task.await(task_one, :infinity)
       result_two = Task.await(task_two, :infinity)
       assert result_one == result_two
+    end
+  end
+
+  describe "handle_info/2" do
+    setup do
+      {:ok, pid} = Producer.start_link(url: "https://www.mbta.com/")
+      {:ok, %{pid: pid}}
+    end
+
+    test "passes messages to the HTTP module", %{pid: pid} do
+      # should be ignored
+      log =
+        capture_log(fn ->
+          send(pid, {:ssl_closed, :port})
+          GenStage.stop(pid)
+        end)
+
+      assert log == ""
+    end
+
+    test "logs a warning for other messages", %{pid: pid} do
+      log =
+        capture_log(fn ->
+          send(pid, :other)
+          GenStage.stop(pid)
+        end)
+
+      assert log =~ "unexpected message"
+      assert log =~ ":other"
     end
   end
 

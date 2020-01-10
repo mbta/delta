@@ -40,6 +40,15 @@ defmodule Delta.Producer.Hackney do
     end
   end
 
+  @impl Delta.Producer.HTTP
+  def stream(conn, {:ssl_closed, _}) do
+    {:ok, conn, []}
+  end
+
+  def stream(_conn, _other) do
+    :unknown
+  end
+
   defp maybe_file(conn, headers, ref) do
     new_conn = update_cache_headers(conn, headers)
 

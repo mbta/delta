@@ -77,6 +77,22 @@ defmodule Delta.Producer do
     {:noreply, [], state}
   end
 
+  def handle_info(message, state) do
+    case state.http_mod.stream(state.conn, message) do
+      {:ok, conn, files} ->
+        state = %{state | conn: conn}
+        {:noreply, files, state}
+
+      :unknown ->
+        _ =
+          Logger.warn(
+            "#{__MODULE__} unexpected message message=#{inspect(message)} state=#{inspect(state)}"
+          )
+
+        {:noreply, [], state}
+    end
+  end
+
   defp handle_file(state, file) do
     file = apply_filters(file, state.filters)
     state = %{state | demand: max(state.demand - 1, 0)}
