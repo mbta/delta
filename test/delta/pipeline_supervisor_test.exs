@@ -6,9 +6,15 @@ defmodule Delta.PipelineSupervisorTest do
 
   describe "start_link/1" do
     test "can start a pipeline with some basic producers and sinks" do
+      bypass = Bypass.open()
+
+      Bypass.expect(bypass, fn conn ->
+        Plug.Conn.send_resp(conn, 200, "body")
+      end)
+
       config = %{
         "producers" => %{
-          "test" => %{"url" => "https://cdn.mbta.com/realtime/VehiclePositions.pb"}
+          "test" => %{"url" => "http://127.0.0.1:#{bypass.port}/"}
         },
         "sinks" => %{
           "s3" => %{
@@ -29,8 +35,12 @@ defmodule Delta.PipelineSupervisorTest do
           children = Supervisor.count_children(pid)
           assert children.active == 3
           assert children.workers == 3
-          # TODO is there a better way to ensure we process one file?
-          Process.sleep(1_000)
+
+          [_] =
+            [PipelineSupervisor.producer_name("test")]
+            |> GenStage.stream()
+            |> Enum.take(1)
+
           Supervisor.stop(pid)
         end)
 

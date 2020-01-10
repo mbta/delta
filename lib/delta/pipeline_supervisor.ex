@@ -61,7 +61,8 @@ defmodule Delta.PipelineSupervisor do
     {Delta.Sink.Log, []}
   end
 
-  defp producer_name(name) do
+  @doc false
+  def producer_name(name) do
     {:via, Registry, {Delta.Registry, name}}
   end
 end
