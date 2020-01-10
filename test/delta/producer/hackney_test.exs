@@ -15,12 +15,15 @@ defmodule Delta.Producer.HackneyTest do
 
     test "can return a basic file", %{bypass: bypass, url: url, conn: conn} do
       Bypass.expect_once(bypass, fn conn ->
-        send_resp(conn, 200, "body")
+        conn
+        |> put_resp_header("content-type", "text/plain")
+        |> send_resp(200, "body")
       end)
 
       assert {:ok, _conn, file} = Hackney.fetch(conn)
       assert file.url == url
       assert %DateTime{} = file.updated_at
+      assert file.content_type == "text/plain"
       assert file.encoding == :none
       assert file.body == "body"
     end

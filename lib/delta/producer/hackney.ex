@@ -61,12 +61,12 @@ defmodule Delta.Producer.Hackney do
 
   defp build_file(state, headers, body) do
     encoding =
-      case Enum.find_value(headers, fn {key, value} ->
-             String.downcase(key) == "content-encoding" and value
-           end) do
+      case find_header(headers, "content-encoding") do
         "gzip" -> :gzip
         nil -> :none
       end
+
+    content_type = find_header(headers, "content-type")
 
     updated_at = parse_datetime(best_datetime(headers))
 
@@ -74,8 +74,15 @@ defmodule Delta.Producer.Hackney do
       updated_at: updated_at,
       url: state.url,
       body: body,
+      content_type: content_type,
       encoding: encoding
     }
+  end
+
+  defp find_header(headers, header) do
+    Enum.find_value(headers, fn {key, value} ->
+      String.downcase(key) == header and value
+    end)
   end
 
   defp update_cache_headers(conn, headers) do
