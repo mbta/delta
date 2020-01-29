@@ -94,6 +94,7 @@ defmodule Delta.Sink.S3Test do
       # length of "body"
       assert log =~ "bytes=4"
       assert log =~ "reason=:failure"
+      assert log =~ "request=%ExAws.Operation.S3{"
     end
   end
 

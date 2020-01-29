@@ -22,12 +22,10 @@ defmodule Delta.Sink.S3 do
       content_type: content_type(file)
     ]
 
-    response =
-      config.bucket
-      |> S3.put_object(full_filename, file.body, put_config)
-      |> ex_aws.request
+    request = S3.put_object(config.bucket, full_filename, file.body, put_config)
+    response = ex_aws.request(request)
 
-    _ = log_response(config, full_filename, file, response)
+    _ = log_response(config, full_filename, file, request, response)
 
     :ok
   end
@@ -55,7 +53,7 @@ defmodule Delta.Sink.S3 do
     end
   end
 
-  defp log_response(config, full_filename, file, response) do
+  defp log_response(config, full_filename, file, request, response) do
     level =
       case response do
         {:ok, _} ->
@@ -72,7 +70,7 @@ defmodule Delta.Sink.S3 do
             "uploaded"
 
           {:error, reason} ->
-            "failed to upload reason=#{inspect(reason)}"
+            "failed to upload reason=#{inspect(reason)} request=#{inspect(request)}"
         end
 
       "#{__MODULE__} #{response_text} bucket=#{config.bucket} path=#{full_filename} content_type=#{
