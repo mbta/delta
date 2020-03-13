@@ -21,6 +21,22 @@ defmodule Delta.File do
         }
   @type encoding :: :none | :gzip
 
+  @doc """
+  Ensure that the file is not encoded.
+
+  This can be useful if other filters further down the chain need to interact
+  with a normal file.
+  """
+  @spec ensure_not_encoded(t()) :: t()
+  def ensure_not_encoded(%__MODULE__{encoding: :gzip} = file) do
+    encoded_body = :zlib.gunzip(file.body)
+    %{file | body: encoded_body, encoding: :none}
+  end
+
+  def ensure_not_encoded(%__MODULE__{} = file) do
+    file
+  end
+
   @doc "Ensure that the file is GZip-encoded."
   @spec ensure_gzipped(t()) :: t()
   def ensure_gzipped(%__MODULE__{content_type: ct, encoding: :none} = file)

@@ -3,6 +3,18 @@ defmodule Delta.FileTest do
   use ExUnit.Case, async: true
   alias Delta.File
 
+  describe "ensure_not_encoded/1" do
+    test "does nothing for not encoded files" do
+      file = %File{encoding: :none}
+      assert File.ensure_not_encoded(file) == file
+    end
+
+    test "gzip decodes an encoded file" do
+      file = %File{body: :zlib.gzip("1234"), encoding: :gzip}
+      assert %File{body: "1234", encoding: :none} = File.ensure_not_encoded(file)
+    end
+  end
+
   describe "ensure_gzipped/1" do
     test "does nothing for already encoded files" do
       file = %File{encoding: :gzip}
