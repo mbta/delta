@@ -40,4 +40,38 @@ defmodule Delta.FileTest do
       assert file.content_type == "application/octet-stream"
     end
   end
+
+  describe "json_split_path" do
+    test "splits a file into parts based on the path" do
+      json = ~s(
+        {
+          "a": {
+            "b": [1, 2]
+          }
+        })
+      file = %File{body: json}
+      assert [one, two] = File.json_split_path(file, ["a", "b"])
+      assert one.body == "1"
+      assert two.body == "2"
+    end
+
+    test "returns the file unmodified if it doesn't parse" do
+      file = %File{body: "not json"}
+      assert File.json_split_path(file, ["a"]) == file
+    end
+  end
+
+  describe "json_rename" do
+    test "renames a file based on a path" do
+      json = ~s({"id": 1})
+      file = %File{url: "https://www.mbta.com/hello", body: json}
+      file = File.json_rename(file, "id")
+      assert file.url == "https://www.mbta.com/hello#1"
+    end
+
+    test "returns the file unmodified if it doesn't parse" do
+      file = %File{body: "not json"}
+      assert File.json_rename(file, ["a"]) == file
+    end
+  end
 end
