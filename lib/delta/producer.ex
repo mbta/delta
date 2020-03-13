@@ -12,7 +12,7 @@ defmodule Delta.Producer do
           | {:frequency, non_neg_integer}
           | {:http_mod, module}
           | {:filters, [filter]}
-  @type filter :: (File.t() -> File.t())
+  @type filter :: (File.t() -> File.t() | [File.t()])
 
   @default_frequency 60_000
   @default_http_mod Delta.Producer.Hackney
@@ -94,9 +94,9 @@ defmodule Delta.Producer do
   end
 
   defp handle_file(state, file) do
-    file = apply_filters(file, state.filters)
-    state = %{state | demand: max(state.demand - 1, 0)}
-    {:noreply, [file], state}
+    files = apply_filters([file], state.filters)
+    state = %{state | demand: max(state.demand - Enum.count(files), 0)}
+    {:noreply, files, state}
   end
 
   def handle_error(state, reason) do
@@ -127,13 +127,19 @@ defmodule Delta.Producer do
     System.monotonic_time(:millisecond)
   end
 
-  @spec apply_filters(File.t(), [filter]) :: File.t()
-  defp apply_filters(%File{} = file, [filter | rest]) do
-    %File{} = file = filter.(file)
-    apply_filters(file, rest)
+  @spec apply_filters([File.t()], [filter]) :: [File.t()]
+  defp apply_filters(files, [filter | rest]) do
+    files =
+      Enum.flat_map(files, fn file ->
+        file
+        |> filter.()
+        |> List.wrap()
+      end)
+
+    apply_filters(files, rest)
   end
 
-  defp apply_filters(%File{} = file, []) do
-    file
+  defp apply_filters(files, []) do
+    files
   end
 end
