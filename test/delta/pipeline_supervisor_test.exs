@@ -14,7 +14,10 @@ defmodule Delta.PipelineSupervisorTest do
 
       config = %{
         "producers" => %{
-          "test" => %{"url" => "http://127.0.0.1:#{bypass.port}/"}
+          "test" => %{
+            "url" => "http://127.0.0.1:#{bypass.port}/",
+            "filters" => [["ensure_not_encoded"]]
+          }
         },
         "sinks" => %{
           "s3" => %{
