@@ -30,6 +30,7 @@ defmodule Delta.PipelineSupervisor do
       url: Map.fetch!(config, "url"),
       headers: Map.get(config, "headers", %{}),
       frequency: Map.get(config, "frequency", 60_000),
+      filters: producer_filters(Map.get(config, "filters", [])),
       name: producer_name(name)
     ]
   end
@@ -65,5 +66,16 @@ defmodule Delta.PipelineSupervisor do
   @doc false
   def producer_name(name) do
     {:via, Registry, {Delta.Registry, name}}
+  end
+
+  defp producer_filters(filters) do
+    Enum.map(filters, &do_producer_filter/1) ++ Delta.Producer.default_filters()
+  end
+
+  defp do_producer_filter([name | args]) do
+    # ensure Delta.File is loaded so the atoms have been added to the table
+    {:module, _} = Code.ensure_loaded(Delta.File)
+    fun_name = String.to_existing_atom(name)
+    &apply(Delta.File, fun_name, [&1 | args])
   end
 end
