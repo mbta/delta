@@ -49,4 +49,28 @@ defmodule Delta.File do
     types = Application.get_env(:delta, :content_type_extensions)
     Map.get_lazy(types, extension, fn -> Application.get_env(:delta, :default_content_type) end)
   end
+
+  @doc "Split a JSON file into sub files, based on an access path"
+  @spec json_split_path(t(), term) :: [t()]
+  def json_split_path(%__MODULE__{body: body} = file, path) do
+    with {:ok, json} <- Jason.decode(body),
+         parts when is_list(parts) <- get_in(json, List.wrap(path)) do
+      for part <- parts do
+        %{file | body: Jason.encode!(part)}
+      end
+    else
+      _ -> file
+    end
+  end
+
+  @doc "Renames a JSON file, based on an access path"
+  @spec json_rename(t(), term) :: t()
+  def json_rename(%__MODULE__{body: body} = file, path) do
+    with {:ok, json} <- Jason.decode(body),
+         name <- get_in(json, List.wrap(path)) do
+      %{file | url: "#{file.url}\##{name}"}
+    else
+      _ -> file
+    end
+  end
 end
