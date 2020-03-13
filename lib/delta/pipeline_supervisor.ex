@@ -28,6 +28,7 @@ defmodule Delta.PipelineSupervisor do
   defp producer_opts(name, config) do
     [
       url: Map.fetch!(config, "url"),
+      headers: Map.get(config, "headers", %{}),
       frequency: Map.get(config, "frequency", 60_000),
       name: producer_name(name)
     ]

@@ -61,6 +61,19 @@ defmodule Delta.ProducerTest do
       result_two = Task.await(task_two, :infinity)
       assert result_one == result_two
     end
+
+    test "can send other headers" do
+      bypass = Bypass.open()
+
+      Bypass.expect(bypass, fn conn ->
+        header = Plug.Conn.get_req_header(conn, "x-test")
+        Plug.Conn.send_resp(conn, 200, header)
+      end)
+
+      url = "http://127.0.0.1:#{bypass.port}"
+      {:ok, pid} = Producer.start_link(url: url, headers: %{"X-Test": "value"}, filters: [])
+      assert [%Delta.File{body: "value"}] = Enum.take(GenStage.stream([pid]), 1)
+    end
   end
 
   describe "handle_info/2" do

@@ -3,12 +3,12 @@ defmodule Delta.Producer.Hackney do
   Implementation of HTTP behavior using the Hackney HTTP library.
   """
   @behaviour Delta.Producer.HTTP
-
+  @default_headers [
+    {"accept-encoding", "gzip"}
+  ]
   defstruct [
     :url,
-    headers: [
-      {"accept-encoding", "gzip"}
-    ]
+    headers: @default_headers
   ]
 
   @hackney_opts [
@@ -16,8 +16,9 @@ defmodule Delta.Producer.Hackney do
   ]
 
   @impl Delta.Producer.HTTP
-  def new(url) do
-    {:ok, %__MODULE__{url: url}}
+  def new(url, opts \\ []) do
+    headers = Keyword.get(opts, :headers, []) ++ @default_headers
+    {:ok, %__MODULE__{url: url, headers: headers}}
   end
 
   @impl Delta.Producer.HTTP
