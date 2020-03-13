@@ -26,12 +26,16 @@ defmodule Delta.Producer do
 
   defstruct [:conn, :http_mod, :frequency, :filters, :last_fetched, :ref, headers: [], demand: 0]
 
+  def default_filters do
+    [&File.ensure_content_type/1, &File.ensure_gzipped/1]
+  end
+
   @impl GenStage
   def init(opts) do
     url = Keyword.get(opts, :url)
     frequency = Keyword.get(opts, :frequency, @default_frequency)
     http_mod = Keyword.get(opts, :http_mod, @default_http_mod)
-    filters = Keyword.get(opts, :filters, [&File.ensure_content_type/1, &File.ensure_gzipped/1])
+    filters = Keyword.get(opts, :filters, default_filters())
     {:ok, conn} = http_mod.new(url)
 
     state = %__MODULE__{
