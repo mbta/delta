@@ -14,12 +14,14 @@ ENV MIX_ENV=prod
 WORKDIR /root
 
 ADD mix.exs mix.exs
+ADD mix.lock mix.lock
+ADD config/*.exs config/
 
-RUN elixir --erl "-smp enable" /usr/local/bin/mix do deps.get --only prod, deps.compile
+RUN mix do deps.get --only prod, deps.compile
 
 ADD . .
 
-RUN elixir --erl "-smp enable" /usr/local/bin/mix do compile, release
+RUN mix do compile, release
 
 # Second stage: copies the files from the builder stage
 FROM alpine:3.10
