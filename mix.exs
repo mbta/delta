@@ -34,7 +34,7 @@ defmodule Delta.MixProject do
 
   defp deps do
     [
-      {:gen_stage, "~> 0.14"},
+      {:gen_stage, "~> 1.0"},
       {:hackney, "~> 1.15"},
       {:cowlib, "~> 2.8"},
       {:ex_aws, "~> 2.1"},
