@@ -1,8 +1,8 @@
 # Fail if any command fails
 set -e
 
-ELIXIR_VERSION=1.9.4
-ERLANG_VERSION=22.2.1
+ELIXIR_VERSION=1.10.2
+ERLANG_VERSION=22.3
 
 export ERL_HOME="${SEMAPHORE_CACHE_DIR}/.kerl/installs/${ERLANG_VERSION}"
 
