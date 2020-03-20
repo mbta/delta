@@ -88,4 +88,21 @@ defmodule Delta.FileTest do
       assert File.json_rename(file, ["a"]) == file
     end
   end
+
+  describe "json_updated_at/2" do
+    test "adjusts the file's updated_at based on a path" do
+      json = ~s({"time": 0})
+      file = %File{url: "https://www.mbta.com/hello", body: json, updated_at: DateTime.utc_now()}
+      file = File.json_updated_at(file, "time")
+      assert file.updated_at == DateTime.from_unix!(0)
+    end
+
+    test "returns the file unmodified if it doesn't parse" do
+      file = %File{body: "not json"}
+      assert File.json_updated_at(file, ["a"]) == file
+
+      file = %File{body: ~s({"a": "not a date"})}
+      assert File.json_updated_at(file, ["a"]) == file
+    end
+  end
 end

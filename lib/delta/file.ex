@@ -84,6 +84,17 @@ defmodule Delta.File do
     end
   end
 
+  @doc "Gets the updated_at time from a JSON path"
+  @spec json_updated_at(t(), term) :: t()
+  def json_updated_at(%__MODULE__{} = file, path) do
+    with {:ok, time} when time != nil <- get_json_path(file, path),
+         {:ok, time} <- decode_time(time) do
+      %{file | updated_at: time}
+    else
+      _ -> file
+    end
+  end
+
   @spec get_json_path(t(), term) :: {:ok, term} | t()
   defp get_json_path(%__MODULE__{body: body} = file, path) do
     case Jason.decode(body) do
