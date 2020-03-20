@@ -3,6 +3,8 @@ defmodule Delta.FileTest do
   use ExUnit.Case, async: true
   alias Delta.File
 
+  doctest File
+
   describe "ensure_not_encoded/1" do
     test "does nothing for not encoded files" do
       file = %File{encoding: :none}
