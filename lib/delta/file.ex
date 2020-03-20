@@ -96,4 +96,51 @@ defmodule Delta.File do
         file
     end
   end
+
+  @unix_ms_cutoff 1_000_000_000_000
+
+  @doc """
+  Decodes some types of time values into DateTime structs.
+
+  ## Examples
+
+  iex> File.decode_time(1567094515535)
+  {:ok, ~U[2019-08-29 16:01:55.535Z]}
+
+
+  iex> File.decode_time(1567094515)
+  {:ok, ~U[2019-08-29 16:01:55Z]}
+
+  iex> File.decode_time("2019-08-29T16:01:55Z")
+  {:ok, ~U[2019-08-29 16:01:55Z]}
+
+  iex> File.decode_time("invalid")
+  :error
+  """
+  @spec decode_time(term) :: {:ok, DateTime.t()} | :error
+  def decode_time(term)
+
+  def decode_time(binary) when is_binary(binary) do
+    case DateTime.from_iso8601(binary) do
+      {:ok, dt, _offset} -> {:ok, dt}
+      {:error, _} -> :error
+    end
+  end
+
+  def decode_time(unix_ms) when is_integer(unix_ms) and unix_ms >= @unix_ms_cutoff do
+    case DateTime.from_unix(unix_ms, :millisecond) do
+      {:ok, dt} -> {:ok, dt}
+      {:error, _} -> :error
+    end
+  end
+
+  def decode_time(unix) when is_integer(unix) do
+    case DateTime.from_unix(unix) do
+      {:ok, dt} ->
+        {:ok, dt}
+
+      {:error, _} ->
+        :error
+    end
+  end
 end
