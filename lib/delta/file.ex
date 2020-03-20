@@ -68,25 +68,32 @@ defmodule Delta.File do
 
   @doc "Split a JSON file into sub files, based on an access path"
   @spec json_split_path(t(), term) :: [t()]
-  def json_split_path(%__MODULE__{body: body} = file, path) do
-    with {:ok, json} <- Jason.decode(body),
-         parts when is_list(parts) <- get_in(json, List.wrap(path)) do
+  def json_split_path(%__MODULE__{} = file, path) do
+    with {:ok, parts} when is_list(parts) <- get_json_path(file, path) do
       for part <- parts do
         %{file | body: Jason.encode!(part)}
       end
-    else
-      _ -> file
     end
   end
 
   @doc "Renames a JSON file, based on an access path"
   @spec json_rename(t(), term) :: t()
-  def json_rename(%__MODULE__{body: body} = file, path) do
-    with {:ok, json} <- Jason.decode(body),
-         name <- get_in(json, List.wrap(path)) do
+  def json_rename(%__MODULE__{} = file, path) do
+    with {:ok, name} when name != nil <- get_json_path(file, path) do
       %{file | url: "#{file.url}\##{name}"}
-    else
-      _ -> file
+    end
+  end
+
+  @spec get_json_path(t(), term) :: {:ok, term} | t()
+  defp get_json_path(%__MODULE__{body: body} = file, path) do
+    case Jason.decode(body) do
+      {:ok, json} ->
+        value = get_in(json, List.wrap(path))
+        {:ok, value}
+
+      _ ->
+        # return the file unmodified
+        file
     end
   end
 end
