@@ -40,7 +40,7 @@ defmodule Delta.MixProject do
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
       {:jason, "~> 1.0"},
-      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.3.1", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
       {:bypass, "~> 1.0", only: :test},
