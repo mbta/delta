@@ -69,9 +69,9 @@ defmodule Delta.FileTest do
       assert two.body == "2"
     end
 
-    test "returns the file unmodified if it doesn't parse" do
+    test "returns nothing if it doesn't parse" do
       file = %File{body: "not json"}
-      assert File.json_split_path(file, ["a"]) == file
+      assert File.json_split_path(file, ["a"]) == []
     end
   end
 
@@ -79,13 +79,13 @@ defmodule Delta.FileTest do
     test "renames a file based on a path" do
       json = ~s({"id": 1})
       file = %File{url: "https://www.mbta.com/hello", body: json}
-      file = File.json_rename(file, "id")
+      [file] = File.json_rename(file, "id")
       assert file.url == "https://www.mbta.com/hello#1"
     end
 
-    test "returns the file unmodified if it doesn't parse" do
+    test "returns nothing if it doesn't parse" do
       file = %File{body: "not json"}
-      assert File.json_rename(file, ["a"]) == file
+      assert File.json_rename(file, ["a"]) == []
     end
   end
 
@@ -93,16 +93,16 @@ defmodule Delta.FileTest do
     test "adjusts the file's updated_at based on a path" do
       json = ~s({"time": 0})
       file = %File{url: "https://www.mbta.com/hello", body: json, updated_at: DateTime.utc_now()}
-      file = File.json_updated_at(file, "time")
+      [file] = File.json_updated_at(file, "time")
       assert file.updated_at == DateTime.from_unix!(0)
     end
 
-    test "returns the file unmodified if it doesn't parse" do
+    test "returns nothing if it doesn't parse" do
       file = %File{body: "not json"}
-      assert File.json_updated_at(file, ["a"]) == file
+      assert File.json_updated_at(file, ["a"]) == []
 
       file = %File{body: ~s({"a": "not a date"})}
-      assert File.json_updated_at(file, ["a"]) == file
+      assert File.json_updated_at(file, ["a"]) == []
     end
   end
 end
