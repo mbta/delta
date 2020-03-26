@@ -69,42 +69,40 @@ defmodule Delta.File do
   @doc "Split a JSON file into sub files, based on an access path"
   @spec json_split_path(t(), term) :: [t()]
   def json_split_path(%__MODULE__{} = file, path) do
-    with {:ok, parts} when is_list(parts) <- get_json_path(file, path) do
-      for part <- parts do
-        %{file | body: Jason.encode!(part)}
-      end
+    for part <- get_json_path(file, path) do
+      %{file | body: Jason.encode!(part)}
     end
   end
 
   @doc "Renames a JSON file, based on an access path"
-  @spec json_rename(t(), term) :: t()
+  @spec json_rename(t(), term) :: [t()]
   def json_rename(%__MODULE__{} = file, path) do
-    with {:ok, name} when name != nil <- get_json_path(file, path) do
+    for name <- get_json_path(file, path),
+        name != nil do
       %{file | url: "#{file.url}\##{name}"}
     end
   end
 
   @doc "Gets the updated_at time from a JSON path"
-  @spec json_updated_at(t(), term) :: t()
+  @spec json_updated_at(t(), term) :: [t()]
   def json_updated_at(%__MODULE__{} = file, path) do
-    with {:ok, time} when time != nil <- get_json_path(file, path),
-         {:ok, time} <- decode_time(time) do
+    for time <- get_json_path(file, path),
+        time != nil,
+        {:ok, time} <- [decode_time(time)] do
       %{file | updated_at: time}
-    else
-      _ -> file
     end
   end
 
-  @spec get_json_path(t(), term) :: {:ok, term} | t()
-  defp get_json_path(%__MODULE__{body: body} = file, path) do
+  @spec get_json_path(t(), term) :: [t()]
+  defp get_json_path(%__MODULE__{body: body}, path) do
     case Jason.decode(body) do
       {:ok, json} ->
         value = get_in(json, List.wrap(path))
-        {:ok, value}
+        List.wrap(value)
 
       _ ->
-        # return the file unmodified
-        file
+        # return no files (empty list)
+        []
     end
   end
 
