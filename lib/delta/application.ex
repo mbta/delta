@@ -8,7 +8,8 @@ defmodule Delta.Application do
   def start(_type, _args) do
     children = [
       {Registry, keys: :unique, name: Delta.Registry},
-      {Delta.PipelineSupervisor, config(Application.get_env(:delta, :config_sources))}
+      {Delta.PipelineSupervisor, config(Application.get_env(:delta, :config_sources))},
+      DeltaWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -6,6 +6,7 @@ defmodule Delta.MixProject do
       app: :delta,
       version: "0.1.0",
       elixir: "~> 1.9",
+      compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: [
@@ -42,6 +43,8 @@ defmodule Delta.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:jason, "~> 1.0"},
       {:credo, "~> 1.3.1", only: [:dev, :test], runtime: false},
+      {:phoenix, "~> 1.4"},
+      {:plug_cowboy, "~> 2.1"},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
       {:bypass, "~> 1.0", only: :test},
