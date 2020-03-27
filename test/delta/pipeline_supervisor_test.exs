@@ -17,6 +17,9 @@ defmodule Delta.PipelineSupervisorTest do
           "test" => %{
             "url" => "http://127.0.0.1:#{bypass.port}/",
             "filters" => [["ensure_not_encoded"]]
+          },
+          "webhook" => %{
+            "type" => "webhook"
           }
         },
         "sinks" => %{
@@ -36,8 +39,8 @@ defmodule Delta.PipelineSupervisorTest do
         capture_log(fn ->
           {:ok, pid} = PipelineSupervisor.start_link(config)
           children = Supervisor.count_children(pid)
-          assert children.active == 3
-          assert children.workers == 3
+          assert children.active == 4
+          assert children.workers == 4
 
           [_] =
             [PipelineSupervisor.producer_name("test")]

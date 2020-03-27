@@ -18,21 +18,32 @@ defmodule Delta.PipelineSupervisor do
     }
   end
 
-  defp producer_spec({name, config}) do
+  defp producer_spec({name, %{"type" => "webhook"} = config}) do
+    opts = [
+      authorization: Map.get(config, "authorization"),
+      filters: producer_filters(Map.get(config, "filters", [])),
+      name: producer_name(name)
+    ]
+
     %{
       id: {:producer, name},
-      start: {Delta.Producer, :start_link, [producer_opts(name, config)]}
+      start: {Delta.WebhookProducer, :start_link, [opts]}
     }
   end
 
-  defp producer_opts(name, config) do
-    [
-      url: Map.fetch!(config, "url"),
+  defp producer_spec({name, %{"url" => url} = config}) do
+    opts = [
+      url: url,
       headers: Map.get(config, "headers", %{}),
       frequency: Map.get(config, "frequency", 60_000),
       filters: producer_filters(Map.get(config, "filters", [])),
       name: producer_name(name)
     ]
+
+    %{
+      id: {:producer, name},
+      start: {Delta.Producer, :start_link, [opts]}
+    }
   end
 
   defp sink_spec({name, config}) do

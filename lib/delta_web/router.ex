@@ -11,5 +11,7 @@ defmodule DeltaWeb.Router do
 
   scope "/", DeltaWeb do
     pipe_through([:webhook])
+
+    post("/webhook/:name", WebhookController, :update)
   end
 end
