@@ -5,6 +5,13 @@ config :delta,
     {:system, "DELTA_JSON"}
   ]
 
+config :delta, DeltaWeb.Endpoint,
+  server: true,
+  http: [:inet6, port: 4000],
+  url: [host: {:system, "HOST"}, port: 443]
+
+config :delta, DeltaWeb.Router, require_https: true
+
 config :sasl, errlog_type: :error
 
 config :logger,

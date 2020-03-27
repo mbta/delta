@@ -11,9 +11,15 @@ config :delta,
     ".zip" => "application/zip"
   }
 
+config :delta, DeltaWeb.Endpoint, url: [host: "localhost"]
+
+config :delta, DeltaWeb.Router, require_https?: false
+
 config :logger, level: :info
 
 config :ex_aws,
   json_codec: Jason
+
+config :phoenix, :json_library, Jason
 
 import_config "#{Mix.env()}.exs"
