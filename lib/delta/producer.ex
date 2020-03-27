@@ -132,8 +132,9 @@ defmodule Delta.Producer do
     System.monotonic_time(:millisecond)
   end
 
+  @doc "Apply a list of filters to a list of files"
   @spec apply_filters([File.t()], [filter]) :: [File.t()]
-  defp apply_filters(files, [filter | rest]) do
+  def apply_filters(files, [filter | rest]) do
     files =
       Enum.flat_map(files, fn file ->
         file
@@ -144,7 +145,7 @@ defmodule Delta.Producer do
     apply_filters(files, rest)
   end
 
-  defp apply_filters(files, []) do
+  def apply_filters(files, []) do
     files
   end
 end
