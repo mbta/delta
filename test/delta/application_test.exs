@@ -20,5 +20,11 @@ defmodule Delta.ApplicationTest do
       System.put_env(env_var, json)
       assert ^expected = Application.config([{:system, env_var}])
     end
+
+    test "can get configuration from raw JSON" do
+      expected = %{"producers" => %{}, "sinks" => %{"log" => %{"type" => "log"}}}
+      json = Jason.encode!(expected)
+      assert ^expected = Application.config([{:json, json}])
+    end
   end
 end
