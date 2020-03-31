@@ -10,6 +10,10 @@ defmodule DeltaWeb.Router do
   end
 
   scope "/", DeltaWeb do
+    get("/_health", HealthController, :index)
+  end
+
+  scope "/", DeltaWeb do
     pipe_through([:webhook])
 
     post("/webhook/:name", WebhookController, :update)
