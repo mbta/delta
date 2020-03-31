@@ -9,6 +9,7 @@ defmodule Delta.MixProject do
       compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      releases: releases(),
       dialyzer: [
         plt_add_deps: :transitive,
         flags: [
@@ -41,6 +42,7 @@ defmodule Delta.MixProject do
       {:cowlib, "~> 2.8"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
+      {:ex_aws_secretsmanager, "~> 2.0"},
       {:jason, "~> 1.0"},
       {:credo, "~> 1.3.1", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.4"},
@@ -49,6 +51,15 @@ defmodule Delta.MixProject do
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
       {:bypass, "~> 1.0", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod}
+    ]
+  end
+
+  defp releases do
+    [
+      delta: [
+        include_executables_for: [:unix],
+        config_providers: [{Delta.SecretsProvider, []}]
+      ]
     ]
   end
 end
