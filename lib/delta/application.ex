@@ -26,6 +26,10 @@ defmodule Delta.Application do
     end
   end
 
+  def config([{:json, json} | _rest]) do
+    decode(json)
+  end
+
   def config([filename | rest]) when is_binary(filename) do
     if File.exists?(filename) do
       decode(File.read!(filename))
