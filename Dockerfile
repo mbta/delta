@@ -40,4 +40,5 @@ COPY --from=builder /root/_build/prod/rel /root/rel
 # Ensure SSL support is enabled
 RUN /root/rel/delta/bin/delta eval ":crypto.supports()"
 
+HEALTHCHECK CMD ["/root/rel/delta/bin/delta", "rpc", "1 + 1"]
 CMD ["/usr/bin/dumb-init", "/root/rel/delta/bin/delta", "start"]
