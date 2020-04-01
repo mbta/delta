@@ -1,24 +1,29 @@
 defmodule DeltaWeb.WebhookControllerTest do
-  use ExUnit.Case, async: true
-  use Plug.Test
-  alias DeltaWeb.WebhookController
+  use DeltaWeb.ConnCase
 
   describe "update/2" do
-    test "returns OK if the webhook suceeds" do
+    @tag :capture_log
+    test "returns OK if the webhook suceeds", %{conn: conn} do
       name = "test_webhook"
 
       {:ok, _pid} =
         Delta.WebhookProducer.start_link(name: Delta.PipelineSupervisor.producer_name(name))
 
-      conn = conn(:post, "/webhook/#{name}", "")
-      conn = WebhookController.update(conn, %{"name" => name})
+      conn =
+        conn
+        |> put_req_header("content-type", "text/plain")
+        |> post(Routes.webhook_path(conn, :update, name), "")
+
       assert conn.status == 200
     end
 
     @tag :capture_log
-    test "returns an error if the webhook does not exist" do
-      conn = conn(:post, "/webhook/missing", "body")
-      conn = WebhookController.update(conn, %{"name" => "missing"})
+    test "returns an error if the webhook does not exist", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("content-type", "text/plain")
+        |> post(Routes.webhook_path(conn, :update, "missing"), "")
+
       assert conn.status == 500
     end
   end
