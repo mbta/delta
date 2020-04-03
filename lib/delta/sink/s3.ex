@@ -16,18 +16,22 @@ defmodule Delta.Sink.S3 do
     ex_aws = Map.get(config, :ex_aws, ExAws)
     full_filename = Path.join(config.prefix, build_filename(file))
 
-    put_config = [
-      acl: config.acl,
-      content_encoding: content_encoding(file),
-      content_type: content_type(file)
-    ]
+    if exists?(config, file, full_filename) do
+      :ok
+    else
+      put_config = [
+        acl: config.acl,
+        content_encoding: content_encoding(file),
+        content_type: content_type(file)
+      ]
 
-    request = S3.put_object(config.bucket, full_filename, file.body, put_config)
-    response = ex_aws.request(request)
+      request = S3.put_object(config.bucket, full_filename, file.body, put_config)
+      response = ex_aws.request(request)
 
-    _ = log_response(config, full_filename, file, request, response)
+      _ = log_response(config, full_filename, file, request, response)
 
-    :ok
+      :ok
+    end
   end
 
   defp build_filename(%File{} = file) do
@@ -37,6 +41,50 @@ defmodule Delta.Sink.S3 do
 
     year <>
       "/" <> month <> "/" <> day <> "/" <> iso_dt <> "_" <> encoded_url <> encoding_suffix(file)
+  end
+
+  defp exists?(config, file, full_filename) do
+    ex_aws = Map.get(config, :ex_aws, ExAws)
+
+    case ex_aws.request(S3.head_object(config.bucket, full_filename)) do
+      {:ok, %{status_code: 200} = head_response} ->
+        is_same_file?(head_response.headers, file)
+
+      _ ->
+        false
+    end
+  end
+
+  defp is_same_file?([{"Content-Encoding", encoding} | rest], file) do
+    if content_encoding(file) == encoding do
+      is_same_file?(rest, file)
+    else
+      false
+    end
+  end
+
+  defp is_same_file?([{"Content-Type", type} | rest], file) do
+    if content_type(file) == type do
+      is_same_file?(rest, file)
+    else
+      false
+    end
+  end
+
+  defp is_same_file?([{"Content-Length", size_bin} | rest], file) do
+    if Integer.to_string(byte_size(file.body)) == size_bin do
+      is_same_file?(rest, file)
+    else
+      false
+    end
+  end
+
+  defp is_same_file?([_ | rest], file) do
+    is_same_file?(rest, file)
+  end
+
+  defp is_same_file?([], _file) do
+    true
   end
 
   defp content_encoding(%File{encoding: :gzip}), do: "gzip"

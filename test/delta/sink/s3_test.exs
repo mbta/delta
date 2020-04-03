@@ -96,6 +96,30 @@ defmodule Delta.Sink.S3Test do
       assert log =~ "reason=:failure"
       assert log =~ "request=%ExAws.Operation.S3{"
     end
+
+    test "does not upload the file if the same file already exists" do
+      config = %{@config | prefix: "not_modified"}
+
+      log =
+        capture_log(fn ->
+          S3.upload_to_s3(config, @sample_file)
+        end)
+
+      refute FakeAws.get()
+      assert log == ""
+    end
+
+    test "re-uploads the file if the metadata is different" do
+      config = %{@config | prefix: "modified"}
+
+      log =
+        capture_log(fn ->
+          S3.upload_to_s3(config, @sample_file)
+        end)
+
+      assert FakeAws.get()
+      refute log == ""
+    end
   end
 
   defmodule FakeAws do
@@ -104,9 +128,34 @@ defmodule Delta.Sink.S3Test do
       Agent.start_link(fn -> nil end, name: __MODULE__)
     end
 
-    def request(request) do
+    def request(%{http_method: :put} = request) do
       Agent.update(__MODULE__, fn _ -> request end)
       {:ok, %{"body" => "response"}}
+    end
+
+    def request(%{http_method: :head, path: "modified" <> _}) do
+      {:ok,
+       %{
+         status_code: 200,
+         headers: [{"Content-Length", "0"}]
+       }}
+    end
+
+    def request(%{http_method: :head, path: "not_modified" <> _}) do
+      {:ok,
+       %{
+         status_code: 200,
+         headers: [
+           {"x-amz-id-2", "12345"},
+           {"Content-Type", "application/x-protobuf"},
+           {"Content-Encoding", "identity"},
+           {"Content-Length", "4"}
+         ]
+       }}
+    end
+
+    def request(%{http_method: :head}) do
+      {:error, {:http_error, 404, %{status_code: 404}}}
     end
 
     def get do
