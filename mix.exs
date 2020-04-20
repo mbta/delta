@@ -49,7 +49,7 @@ defmodule Delta.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws_secretsmanager, "~> 2.0"},
       {:jason, "~> 1.0"},
-      {:credo, "~> 1.3.1", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.4.0", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.4"},
       {:plug_cowboy, "~> 2.1"},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
