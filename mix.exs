@@ -55,7 +55,7 @@ defmodule Delta.MixProject do
       {:plug_cowboy, "~> 2.2"},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
-      {:bypass, "~> 1.0", only: :test},
+      {:bypass, "~> 2.1", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod}
     ]
   end
