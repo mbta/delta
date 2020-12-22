@@ -10,7 +10,7 @@ defmodule Delta.File do
     encoding: :none
   ]
 
-  @already_compressed_content_types Application.get_env(:delta, :compressed_content_types)
+  @already_compressed_content_types Application.compile_env(:delta, :compressed_content_types)
 
   @type t :: %__MODULE__{
           updated_at: DateTime.t(),

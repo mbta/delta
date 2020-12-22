@@ -43,19 +43,18 @@ defmodule Delta.MixProject do
   defp deps do
     [
       {:gen_stage, "~> 1.0"},
-      {:hackney, "~> 1.15"},
-      {:cowlib, "~> 2.8"},
+      {:hackney, "~> 1.17"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws_secretsmanager, "~> 2.0"},
       {:jason, "~> 1.0"},
-      {:credo, "~> 1.4.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.5.3", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.5"},
       {:phoenix_html, "~> 2.14"},
       {:plug_cowboy, "~> 2.2"},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
-      {:bypass, "~> 1.0", only: :test},
+      {:bypass, "~> 2.0", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod}
     ]
   end
