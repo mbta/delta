@@ -1,11 +1,16 @@
 #!/bin/bash
-set -e -x -u
+set -e
 
 # bash script should be called with aws environment ($APP-dev / $APP-dev-green / $APP-prod)
 # other required configuration:
 # * APP
 # * DOCKER_REPO
 awsenv=$1
+
+# log into docker hub if needed
+if [ -n "$DOCKER_USERNAME" ]; then
+    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+fi
 
 # build docker image and tag it with git hash and aws environment
 githash=$(git rev-parse --short HEAD)
