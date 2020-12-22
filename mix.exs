@@ -5,14 +5,14 @@ defmodule Delta.MixProject do
     [
       app: :delta,
       version: "0.1.0",
-      elixir: "~> 1.9",
+      elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases(),
       dialyzer: [
-        plt_add_deps: :transitive,
+        plt_add_deps: :app_tree,
         flags: [
           :race_conditions,
           :unmatched_returns
