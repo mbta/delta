@@ -42,7 +42,9 @@ defmodule Delta.MixProject do
 
   defp deps do
     [
-      {:gen_stage, "~> 1.0"},
+      # this can go back to a release once this commit is in a release -ps
+      {:gen_stage,
+       github: "elixir-lang/gen_stage", ref: "7143c04d32cebeaf2bd743c6eb876ef05f903277"},
       {:hackney, "~> 1.17"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
