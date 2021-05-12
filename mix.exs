@@ -18,7 +18,7 @@ defmodule Delta.MixProject do
           :unmatched_returns
         ]
       ],
-      test_coverage: [tool: ExCoveralls],
+      test_coverage: [tool: LcovEx],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -54,7 +54,7 @@ defmodule Delta.MixProject do
       {:phoenix, "~> 1.5"},
       {:phoenix_html, "~> 2.14"},
       {:plug_cowboy, "~> 2.2"},
-      {:excoveralls, "~> 0.10", only: :test, runtime: false},
+      {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
       {:bypass, "~> 2.0", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod}
