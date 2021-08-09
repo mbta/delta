@@ -52,7 +52,7 @@ defmodule Delta.MixProject do
       {:jason, "~> 1.0"},
       {:credo, "~> 1.5.3", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.5"},
-      {:phoenix_html, "~> 2.14"},
+      {:phoenix_html, "~> 3.0"},
       {:plug_cowboy, "~> 2.2"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
