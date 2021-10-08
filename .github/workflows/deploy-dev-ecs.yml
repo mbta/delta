@@ -12,8 +12,8 @@ jobs:
     environment: dev
     concurrency: dev
     env:
-      ECS_CLUSTER: __cluster_name__
-      ECS_SERVICE: __service_name__
+      ECS_CLUSTER: delta
+      ECS_SERVICE: delta-dev-blue
 
     steps:
       - uses: actions/checkout@v2
