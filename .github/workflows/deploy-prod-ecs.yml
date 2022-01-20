@@ -10,7 +10,7 @@ jobs:
     concurrency: prod
     env:
       ECS_CLUSTER: delta
-      ECS_SERVICE: delta-prod-blue
+      ECS_SERVICE: delta-prod
 
     steps:
       - uses: actions/checkout@v2
