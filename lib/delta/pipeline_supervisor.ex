@@ -2,6 +2,9 @@ defmodule Delta.PipelineSupervisor do
   @moduledoc """
   Supervisor for the Delta pipeline, both producers and sinks.
   """
+
+  alias Delta.Producer.Filter
+
   def start_link(%{"producers" => producers, "sinks" => sinks}) do
     Supervisor.start_link(Enum.map(producers, &producer_spec/1) ++ Enum.map(sinks, &sink_spec/1),
       strategy: :one_for_all
@@ -80,7 +83,7 @@ defmodule Delta.PipelineSupervisor do
   end
 
   defp producer_filters(filters) do
-    Enum.map(filters, &do_producer_filter/1) ++ Delta.Producer.default_filters()
+    Enum.map(filters, &do_producer_filter/1) ++ Filter.default_filters()
   end
 
   defp do_producer_filter([name | args]) do

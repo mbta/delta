@@ -3,13 +3,14 @@ defmodule Delta.WebhookProducer do
   GenStage which fulfills demand by receiving webhook POSTs.
   """
   alias Delta.File
+  alias Delta.Producer.Filter
   use GenStage
   require Logger
 
   @type opts :: [opt]
   @type opt ::
           {:authorization, binary}
-          | {:filters, [Delta.Producer.filter()]}
+          | {:filters, [Filter.t()]}
 
   @start_link_opts [:name]
 
@@ -27,7 +28,7 @@ defmodule Delta.WebhookProducer do
   @impl GenStage
   def init(opts) do
     authorization = Keyword.get(opts, :authorization)
-    filters = Keyword.get(opts, :filters, Delta.Producer.default_filters())
+    filters = Keyword.get(opts, :filters, Filter.default_filters())
 
     state = %__MODULE__{
       authorization: authorization,
@@ -51,7 +52,7 @@ defmodule Delta.WebhookProducer do
            {:ok, body, conn} <- read_body(conn, []) do
         conn
         |> process_file(body)
-        |> Delta.Producer.apply_filters(state.filters)
+        |> Filter.apply_filters(state.filters)
       else
         _ -> []
       end
