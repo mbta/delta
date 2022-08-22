@@ -126,6 +126,5 @@ mix deps.get
 env DELTA_JSON="$(cat config.json)" mix phx.server
 ```
 
-By default, Delta loads configuration the `DELTA_JSON` environment
-variable. You can see a sample JSON configuration in
-[priv/default_configuration.json](priv/default_configuration.json).
+Delta loads configuration from the `DELTA_JSON` environment variable.
+With `MIX_ENV=dev`, it will fall back to [priv/default_configuration.json](priv/default_configuration.json).
