@@ -47,7 +47,7 @@ Delta is configured by JSON. Example:
 
 Delta produces files from two sources: polled HTTP endpoints and webhooks.
 
-### Polling
+### HTTP Polling
 
 Polling sources make an HTTP request for data at a configurable interval.
 
@@ -55,6 +55,17 @@ Configuration options:
 * `url`: Required.
 * `frequency`: Default 60000.
 * `headers`: Default `{}`. Example: `{"content-type": "application/x-protobuf"}`.
+* `filters`: Default `[]`. See Filters below.
+
+### S3 Polling
+
+Makes a request to S3, authenticated by IAM
+
+Configuration options:
+* `type`: Must be `"s3"`.
+* `bucket`: Required string.
+* `path`: Required string.
+* `frequency`: Default 60000.
 * `filters`: Default `[]`. See Filters below.
 
 ### Webhooks

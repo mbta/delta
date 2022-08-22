@@ -34,6 +34,21 @@ defmodule Delta.PipelineSupervisor do
     }
   end
 
+  defp producer_spec({name, %{"type" => "s3"} = config}) do
+    opts = [
+      bucket: Map.fetch!(config, "bucket"),
+      path: Map.fetch!(config, "path"),
+      frequency: Map.get(config, "frequency", 60_000),
+      filters: producer_filters(Map.get(config, "filters", [])),
+      name: producer_name(name)
+    ]
+
+    %{
+      id: {:producer, name},
+      start: {Delta.Producer.S3Producer, :start_link, [opts]}
+    }
+  end
+
   defp producer_spec({name, %{"url" => url} = config}) do
     opts = [
       url: url,
