@@ -13,7 +13,7 @@ defmodule Delta.Producer.S3Producer do
           {:bucket, binary}
           | {:path, binary}
           | {:frequency, non_neg_integer}
-          | {:filters, [Delta.Producer.filter()]}
+          | {:filters, [Filter.t()]}
           | {:ex_aws, module}
 
   @start_link_opts [:name]

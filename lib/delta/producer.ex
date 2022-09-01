@@ -2,7 +2,6 @@ defmodule Delta.Producer do
   @moduledoc """
   GenStage which fulfills demand by making HTTP requests on a configurable frequency.
   """
-  alias Delta.File
   alias Delta.Producer.Filter
   use GenStage
   require Logger
@@ -13,7 +12,6 @@ defmodule Delta.Producer do
           | {:frequency, non_neg_integer}
           | {:http_mod, module}
           | {:filters, [Filter.t()]}
-  @type filter :: (File.t() -> File.t() | [File.t()])
 
   @default_frequency 60_000
   @default_http_mod Delta.Producer.Hackney
