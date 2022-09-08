@@ -12,3 +12,7 @@ config :delta, DeltaWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   secret_key_base: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+config :ex_aws,
+  access_key_id: {:awscli, "default", 30},
+  secret_access_key: {:awscli, "default", 30}

@@ -2,6 +2,9 @@ defmodule Delta.PipelineSupervisor do
   @moduledoc """
   Supervisor for the Delta pipeline, both producers and sinks.
   """
+
+  alias Delta.Producer.Filter
+
   def start_link(%{"producers" => producers, "sinks" => sinks}) do
     Supervisor.start_link(Enum.map(producers, &producer_spec/1) ++ Enum.map(sinks, &sink_spec/1),
       strategy: :one_for_all
@@ -28,6 +31,21 @@ defmodule Delta.PipelineSupervisor do
     %{
       id: {:producer, name},
       start: {Delta.WebhookProducer, :start_link, [opts]}
+    }
+  end
+
+  defp producer_spec({name, %{"type" => "s3"} = config}) do
+    opts = [
+      bucket: Map.fetch!(config, "bucket"),
+      path: Map.fetch!(config, "path"),
+      frequency: Map.get(config, "frequency", 60_000),
+      filters: producer_filters(Map.get(config, "filters", [])),
+      name: producer_name(name)
+    ]
+
+    %{
+      id: {:producer, name},
+      start: {Delta.Producer.S3Producer, :start_link, [opts]}
     }
   end
 
@@ -80,7 +98,7 @@ defmodule Delta.PipelineSupervisor do
   end
 
   defp producer_filters(filters) do
-    Enum.map(filters, &do_producer_filter/1) ++ Delta.Producer.default_filters()
+    Enum.map(filters, &do_producer_filter/1) ++ Filter.default_filters()
   end
 
   defp do_producer_filter([name | args]) do

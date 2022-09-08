@@ -24,3 +24,7 @@ config :logger, :console,
   format: "$dateT$time [$level]$levelpad $message\n"
 
 config :ehmon, :report_mf, {:ehmon, :info_report}
+
+config :ex_aws,
+  access_key_id: :instance_role,
+  secret_access_key: :instance_role

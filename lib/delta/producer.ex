@@ -2,7 +2,7 @@ defmodule Delta.Producer do
   @moduledoc """
   GenStage which fulfills demand by making HTTP requests on a configurable frequency.
   """
-  alias Delta.File
+  alias Delta.Producer.Filter
   use GenStage
   require Logger
 
@@ -11,8 +11,7 @@ defmodule Delta.Producer do
           {:url, binary}
           | {:frequency, non_neg_integer}
           | {:http_mod, module}
-          | {:filters, [filter]}
-  @type filter :: (File.t() -> File.t() | [File.t()])
+          | {:filters, [Filter.t()]}
 
   @default_frequency 60_000
   @default_http_mod Delta.Producer.Hackney
@@ -26,16 +25,12 @@ defmodule Delta.Producer do
 
   defstruct [:conn, :http_mod, :frequency, :filters, :last_fetched, :ref, demand: 0]
 
-  def default_filters do
-    [&File.ensure_content_type/1, &File.ensure_gzipped/1]
-  end
-
   @impl GenStage
   def init(opts) do
     url = Keyword.get(opts, :url)
     frequency = Keyword.get(opts, :frequency, @default_frequency)
     http_mod = Keyword.get(opts, :http_mod, @default_http_mod)
-    filters = Keyword.get(opts, :filters, default_filters())
+    filters = Keyword.get(opts, :filters, Filter.default_filters())
     headers = Keyword.get(opts, :headers, [])
     {:ok, conn} = http_mod.new(url, headers: Enum.to_list(headers))
 
@@ -99,7 +94,7 @@ defmodule Delta.Producer do
   end
 
   defp handle_file(state, file) do
-    files = apply_filters([file], state.filters)
+    files = Filter.apply_filters([file], state.filters)
     state = %{state | demand: max(state.demand - Enum.count(files), 0)}
     {:noreply, files, state}
   end
@@ -132,22 +127,5 @@ defmodule Delta.Producer do
 
   defp monotonic_now do
     System.monotonic_time(:millisecond)
-  end
-
-  @doc "Apply a list of filters to a list of files"
-  @spec apply_filters([File.t()], [filter]) :: [File.t()]
-  def apply_filters(files, [filter | rest]) do
-    files =
-      Enum.flat_map(files, fn file ->
-        file
-        |> filter.()
-        |> List.wrap()
-      end)
-
-    apply_filters(files, rest)
-  end
-
-  def apply_filters(files, []) do
-    files
   end
 end

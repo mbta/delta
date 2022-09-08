@@ -49,6 +49,8 @@ defmodule Delta.MixProject do
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws_secretsmanager, "~> 2.0"},
+      # used by ex_aws to parse AWS CLI settings/credentials
+      {:configparser_ex, "~> 4.0", only: :dev},
       {:jason, "~> 1.0"},
       {:credo, "~> 1.6.4", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.5"},
