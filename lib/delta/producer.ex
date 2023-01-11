@@ -102,9 +102,7 @@ defmodule Delta.Producer do
   def handle_error(state, reason) do
     _ =
       Logger.warn(fn ->
-        "#{__MODULE__} error fetching url=#{inspect(state.conn.url)} error=#{
-          inspect(reason, limit: :infinity)
-        }"
+        "#{__MODULE__} error fetching url=#{inspect(state.conn.url)} error=#{inspect(reason, limit: :infinity)}"
       end)
 
     {:noreply, [], state}
