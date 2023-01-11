@@ -2,7 +2,7 @@ defmodule DeltaWeb.Router do
   use DeltaWeb, :router
 
   pipeline :webhook do
-    if Application.get_env(:delta, __MODULE__)[:require_https?] do
+    if Application.compile_env(:delta, __MODULE__)[:require_https?] do
       plug(Plug.SSL, rewrite_on: [:x_forwarded_proto])
     end
 
