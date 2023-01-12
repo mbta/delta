@@ -76,7 +76,7 @@ defmodule Delta.SecretsProvider do
   end
 
   defp ensure_all_started! do
-    child_apps = for app <- @application_requirements do
+    _child_apps = for app <- @application_requirements do
       {:ok, _} = Application.ensure_all_started(app)
     end
     :ok
