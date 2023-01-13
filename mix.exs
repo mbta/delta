@@ -14,7 +14,6 @@ defmodule Delta.MixProject do
       dialyzer: [
         plt_add_deps: :app_tree,
         flags: [
-          :race_conditions,
           :unmatched_returns
         ]
       ],

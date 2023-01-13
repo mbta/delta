@@ -12,9 +12,7 @@ defmodule Delta.Sink.Log do
   def log(%File{} = file) do
     _ =
       Logger.info(
-        "#{__MODULE__} url=#{inspect(file.url)} updated_at=#{DateTime.to_iso8601(file.updated_at)} encoding=#{
-          file.encoding
-        } bytes=#{byte_size(file.body)}"
+        "#{__MODULE__} url=#{inspect(file.url)} updated_at=#{DateTime.to_iso8601(file.updated_at)} encoding=#{file.encoding} bytes=#{byte_size(file.body)}"
       )
 
     :ok

@@ -14,6 +14,10 @@ defmodule Delta.WebhookProducer do
 
   @start_link_opts [:name]
 
+  @dialyzer [
+    {:no_improper_lists, read_body: 2}
+  ]
+
   def start_link(opts) do
     GenStage.start_link(__MODULE__, opts, Keyword.take(opts, @start_link_opts))
   end

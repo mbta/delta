@@ -121,9 +121,7 @@ defmodule Delta.Sink.S3 do
             "failed to upload reason=#{inspect(reason)} request=#{inspect(request)}"
         end
 
-      "#{__MODULE__} #{response_text} bucket=#{config.bucket} path=#{full_filename} content_type=#{
-        inspect(file.content_type)
-      } bytes=#{byte_size(file.body)}"
+      "#{__MODULE__} #{response_text} bucket=#{config.bucket} path=#{full_filename} content_type=#{inspect(file.content_type)} bytes=#{byte_size(file.body)}"
     end)
   end
 end
