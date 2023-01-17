@@ -8,7 +8,7 @@ on:
 jobs:
   asdf:
     name: ASDF
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
@@ -25,7 +25,7 @@ jobs:
 
   build:
     name: Build and test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: asdf
     steps:
       - uses: actions/checkout@v2
