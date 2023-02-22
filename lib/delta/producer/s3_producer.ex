@@ -108,9 +108,7 @@ defmodule Delta.Producer.S3Producer do
 
       {_, error} ->
         Logger.warn(fn ->
-          "#{__MODULE__} error fetching s3 url=#{s3_url(state.bucket, state.path)}} error=#{
-            inspect(error, limit: :infinity)
-          }"
+          "#{__MODULE__} error fetching s3 url=#{s3_url(state.bucket, state.path)}} error=#{inspect(error, limit: :infinity)}"
         end)
 
         {:noreply, [], state}

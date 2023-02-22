@@ -6,7 +6,7 @@ defmodule Delta.File do
     :updated_at,
     :url,
     :body,
-    content_type: Application.get_env(:delta, :default_content_type),
+    content_type: Application.compile_env(:delta, :default_content_type),
     encoding: :none
   ]
 
