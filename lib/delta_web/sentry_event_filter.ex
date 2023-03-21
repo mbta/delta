@@ -1,4 +1,4 @@
-defmodule SentryWeb.SentryEventFilter do
+defmodule DeltaWeb.SentryEventFilter do
   @moduledoc """
     Provides a filter for exceptions coming from 404 errors
   """

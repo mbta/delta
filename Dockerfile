@@ -17,6 +17,7 @@ WORKDIR /root
 ADD mix.exs mix.exs
 ADD mix.lock mix.lock
 ADD config/config.exs config/
+ADD config/runtime.exs config/
 ADD config/prod.exs config/
 
 RUN mix do deps.get --only prod, deps.compile
