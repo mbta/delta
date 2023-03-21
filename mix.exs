@@ -58,7 +58,8 @@ defmodule Delta.MixProject do
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
       {:bypass, "~> 2.0", only: :test},
-      {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod}
+      {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod},
+      {:sentry, "~> 8.0"}
     ]
   end
 
