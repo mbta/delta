@@ -17,12 +17,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: mbta/actions/build-push-ecr@v1
+      - uses: mbta/actions/build-push-ecr@v2
         id: build-push
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           docker-repo: ${{ secrets.DOCKER_REPO }}
-      - uses: mbta/actions/deploy-ecs@v1
+      - uses: mbta/actions/deploy-ecs@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           ecs-cluster: ${{ env.ECS_CLUSTER }}
