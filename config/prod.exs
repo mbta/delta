@@ -2,7 +2,7 @@ use Mix.Config
 
 config :delta,
   config_sources: [
-    {:system, "DELTA_JSON"}
+    {:system, ["DELTA_JSON", "DELTA_SECRET_JSON"]},
   ]
 
 config :delta, DeltaWeb.Endpoint,
