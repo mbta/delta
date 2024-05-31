@@ -18,6 +18,26 @@ defmodule Delta.Application do
     Supervisor.start_link(children, opts)
   end
 
+  def config([{:system, [_ | _] = env_vars} | rest]) do
+    merged_json_config =
+      Enum.map(env_vars, fn env_var ->
+        if json = System.get_env(env_var) do
+          decode(json)
+        else
+          %{}
+        end
+      end)
+      |> Enum.reduce(%{}, fn next_config, accumulator ->
+        DeepMerge.deep_merge(accumulator, next_config)
+      end)
+
+    if merged_json_config !== %{} do
+      merged_json_config
+    else
+      config(rest)
+    end
+  end
+
   def config([{:system, env_var} | rest]) do
     if json = System.get_env(env_var) do
       decode(json)
