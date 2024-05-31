@@ -26,8 +26,16 @@ defmodule Delta.Application do
         else
           %{}
         end
-      end) |> Enum.reduce(%{}, fn next_config, accumulator -> DeepMerge.deep_merge(accumulator, next_config) end)
-      if merged_json_config !== %{} do merged_json_config else config(rest) end
+      end)
+      |> Enum.reduce(%{}, fn next_config, accumulator ->
+        DeepMerge.deep_merge(accumulator, next_config)
+      end)
+
+    if merged_json_config !== %{} do
+      merged_json_config
+    else
+      config(rest)
+    end
   end
 
   def config([{:system, env_var} | rest]) do
