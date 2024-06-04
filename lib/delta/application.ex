@@ -66,6 +66,39 @@ defmodule Delta.Application do
   end
 
   defp decode(json) do
-    Jason.decode!(json, strings: :copy)
+    decoded_config = Jason.decode!(json, strings: :copy)
+
+    if Map.has_key?(decoded_config, "producers") do
+      result =
+        Enum.reduce(decoded_config["producers"], %{}, fn {k, v}, acc ->
+          Map.put(acc, k, process_headers(v))
+        end)
+
+      %{decoded_config | "producers" => result}
+    else
+      decoded_config
+    end
+  end
+
+  defp process_headers(producer) do
+    if Map.has_key?(producer, "headers") do
+      modified_headers =
+        for {key, raw_value} <- producer["headers"], into: %{} do
+          value =
+            case raw_value do
+              %{"system" => env_var} ->
+                System.get_env(env_var)
+
+              raw_value when is_binary(raw_value) ->
+                raw_value
+            end
+
+          {key, value}
+        end
+
+      %{producer | "headers" => modified_headers}
+    else
+      producer
+    end
   end
 end

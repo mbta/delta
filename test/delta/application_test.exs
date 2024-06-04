@@ -21,6 +21,39 @@ defmodule Delta.ApplicationTest do
       assert ^expected = Application.config([{:system, env_var}])
     end
 
+    test "can get header secrets from the environment" do
+      secure_env_var = "SOME_SECURE_ENV_VAR"
+      secure_value = "SOME_SUPER_SECURE_VALUE"
+      System.put_env(secure_env_var, secure_value)
+
+      expected = %{
+        "producers" => %{
+          "test" => %{
+            "headers" => %{
+              "SOME_HEADER" => "SOME_SUPER_SECURE_VALUE"
+            }
+          }
+        },
+        "sinks" => %{"log" => %{"type" => "log"}}
+      }
+
+      substituted = %{
+        "producers" => %{
+          "test" => %{
+            "headers" => %{
+              "SOME_HEADER" => %{"system" => secure_env_var}
+            }
+          }
+        },
+        "sinks" => %{"log" => %{"type" => "log"}}
+      }
+
+      env_var = "DELTA_APPLICATION_TEST"
+      json = Jason.encode!(substituted)
+      System.put_env(env_var, json)
+      assert ^expected = Application.config([{:system, env_var}])
+    end
+
     test "can get configurations from the environment, merged" do
       expected_first = %{"producers" => %{}, "sinks" => %{"log" => %{"type" => "log"}}}
       env_var_first = "DELTA_APPLICATION_TEST_1"
