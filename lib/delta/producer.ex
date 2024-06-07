@@ -31,7 +31,7 @@ defmodule Delta.Producer do
     frequency = Keyword.get(opts, :frequency, @default_frequency)
     http_mod = Keyword.get(opts, :http_mod, @default_http_mod)
     filters = Keyword.get(opts, :filters, Filter.default_filters())
-    headers = Keyword.get(opts, :headers, [])
+    headers = Keyword.get(opts, :headers, %{})
     {:ok, conn} = http_mod.new(url, headers: Enum.to_list(headers))
 
     state = %__MODULE__{
