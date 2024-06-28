@@ -14,7 +14,8 @@ defmodule Delta.Sink.S3 do
   @spec upload_to_s3(map, File.t()) :: :ok
   def upload_to_s3(config, file) do
     ex_aws = Map.get(config, :ex_aws, ExAws)
-    full_filename = Path.join(config.prefix, build_filename(file))
+    default_filename = Path.join(config.prefix, build_filename(file))
+    full_filename = apply_filename_rewrite(config, default_filename)
 
     if exists?(config, file, full_filename) do
       :ok
@@ -32,6 +33,20 @@ defmodule Delta.Sink.S3 do
 
       :ok
     end
+  end
+
+  defp apply_filename_rewrite(config, filename) do
+    if Map.has_key?(config, :filename_rewrites) do
+      do_apply_filename_rewrite(config.filename_rewrites, filename)
+    else
+      filename
+    end
+  end
+
+  defp do_apply_filename_rewrite(rewrites, filename) do
+    Enum.reduce(rewrites, filename, fn rewrite, modified_filename ->
+      String.replace(modified_filename, rewrite.pattern, rewrite.replacement)
+    end)
   end
 
   defp build_filename(%File{} = file) do
