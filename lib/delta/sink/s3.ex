@@ -35,19 +35,13 @@ defmodule Delta.Sink.S3 do
     end
   end
 
-  defp apply_filename_rewrite(config, filename) do
-    if Map.has_key?(config, :filename_rewrites) do
-      do_apply_filename_rewrite(config.filename_rewrites, filename)
-    else
-      filename
-    end
-  end
-
-  defp do_apply_filename_rewrite(rewrites, filename) do
+  defp apply_filename_rewrite(%{filename_rewrites: rewrites}, filename) do
     Enum.reduce(rewrites, filename, fn rewrite, modified_filename ->
       String.replace(modified_filename, rewrite.pattern, rewrite.replacement)
     end)
   end
+  
+  defp apply_filename_rewrite(_config, filename), do: filename
 
   defp build_filename(%File{} = file) do
     iso_dt = DateTime.to_iso8601(file.updated_at)
