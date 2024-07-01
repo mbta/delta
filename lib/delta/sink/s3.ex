@@ -40,7 +40,7 @@ defmodule Delta.Sink.S3 do
       String.replace(modified_filename, rewrite.pattern, rewrite.replacement)
     end)
   end
-  
+
   defp apply_filename_rewrite(_config, filename), do: filename
 
   defp build_filename(%File{} = file) do
