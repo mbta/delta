@@ -85,7 +85,10 @@ defmodule Delta.PipelineSupervisor do
     {Delta.Sink.S3,
      bucket: Map.fetch!(config, "bucket"),
      prefix: Map.get(config, "prefix", ""),
-     acl: Map.get(config, "acl", "public-read")}
+     acl: Map.get(config, "acl", "public-read"),
+     filename_rewrites:
+       Map.get(config, "filename_rewrites", [])
+       |> Enum.map(fn x -> for {key, val} <- x, into: %{}, do: {String.to_atom(key), val} end)}
   end
 
   defp sink_type_opts(%{"type" => "log"}) do

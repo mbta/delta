@@ -13,6 +13,23 @@ defmodule Delta.Sink.S3Test do
     acl: "acl"
   }
 
+  @config_with_rewrites %{
+    ex_aws: FakeAws,
+    bucket: "fake",
+    prefix: "prefix",
+    acl: "acl",
+    filename_rewrites: [
+      %{
+        pattern: "https_cdn.mbta.com_realtime_Alerts.pb",
+        replacement: "alerts.pb"
+      },
+      %{
+        pattern: "2020",
+        replacement: "2024"
+      }
+    ]
+  }
+
   @sample_file %File{
     updated_at: ~U[2020-01-02T03:04:05Z],
     url: "https://cdn.mbta.com/realtime/Alerts.pb",
@@ -50,6 +67,24 @@ defmodule Delta.Sink.S3Test do
 
       assert request.path ==
                "prefix/2020/01/02/2020-01-02T03:04:05Z_https_cdn.mbta.com_realtime_Alerts.pb"
+    end
+
+    @tag :capture_log
+    test "creates an AWS request - filename rewrite" do
+      :ok = S3.upload_to_s3(@config_with_rewrites, @sample_file)
+      request = FakeAws.get()
+      assert %ExAws.Operation.S3{} = request
+      assert request.body == "body"
+      assert request.bucket == "fake"
+
+      assert %{
+               "content-encoding" => "identity",
+               "content-type" => "application/x-protobuf",
+               "x-amz-acl" => "acl"
+             } = request.headers
+
+      assert request.path ==
+               "prefix/2024/01/02/2024-01-02T03:04:05Z_alerts.pb"
     end
 
     @tag :capture_log

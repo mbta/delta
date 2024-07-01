@@ -116,6 +116,7 @@ Configuration options:
 * `prefix`: Default `""`. Will prepend this to all file names it writes to s3.
 * `acl`: Default `"public-read"`. Passed to `S3.put_object`.
 * `producers`: Required list of string producer names.
+* `filename_rewrites`: Default `[]`. Contains a list of maps like - `%{pattern: "old_value", replacement: "new_value"}` - this will be applied to the resulting s3 filename. Note: the full collection gets applied to every resultant producer filename, so these configurations should be relatively specific. 
 
 ### Log
 
