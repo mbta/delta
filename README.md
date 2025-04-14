@@ -54,7 +54,7 @@ Polling sources make an HTTP request for data at a configurable interval.
 Configuration options:
 * `url`: Required.
 * `frequency`: Default 60000.
-* `headers`: Default `{}`. Example: `{"content-type": "application/x-protobuf"}`.
+* `headers`: Default `{}`. Can fetch values if given an environment variable name. Example: `{"content-type": "application/x-protobuf", "authorization": {"system": "API_SECRET_KEY"}}`.
 * `filters`: Default `[]`. See Filters below.
 
 ### S3 Polling
