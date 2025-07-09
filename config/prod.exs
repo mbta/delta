@@ -10,7 +10,7 @@ config :delta, DeltaWeb.Endpoint,
   http: [:inet6, port: 4000],
   url: [host: {:system, "HOST"}, port: 443]
 
-config :delta, DeltaWeb.Router, require_https: true
+config :delta, DeltaWeb.Router, require_https?: true
 
 config :sasl, errlog_type: :error
 
