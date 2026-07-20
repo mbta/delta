@@ -7,7 +7,8 @@ permissions:
 
 concurrency:
   group: deploy-prod
-  cancel-in-progress: true
+  # Since prod deploys are only triggered manually, let's also require them to be canceled manually.
+  cancel-in-progress: false
 
 jobs:
   deploy:
