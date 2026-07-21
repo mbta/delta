@@ -1,4 +1,4 @@
-name: Deploy to ECS Prod
+name: Deploy to Prod ECS
 
 on: workflow_dispatch
 
