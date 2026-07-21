@@ -1,35 +1,43 @@
-name: Deploy to ECS Prod
+name: Deploy to Prod ECS
+
+on: workflow_dispatch
 
 permissions:
-  id-token: write
+  contents: read # Needed to check out code
 
-on:  workflow_dispatch
+concurrency:
+  group: deploy-prod
+  # Since prod deploys are only triggered manually, let's also require them to be canceled manually.
+  cancel-in-progress: false
 
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: prod
-    concurrency: prod
     env:
       ECS_CLUSTER: delta
       ECS_SERVICE: delta-prod
+    permissions:
+      id-token: write # Needed to communicate with AWS
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: mbta/actions/build-push-ecr@v2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: mbta/actions/build-push-ecr@f3f7205f8e73dddf983ee234dd93e2b45d3c8a9a # v2.23
         id: build-push
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           docker-repo: ${{ secrets.DOCKER_REPO }}
           docker-additional-tags: prod
-      - uses: mbta/actions/deploy-ecs@v2
+      - uses: mbta/actions/deploy-ecs@f3f7205f8e73dddf983ee234dd93e2b45d3c8a9a # v2.23
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           ecs-cluster: ${{ env.ECS_CLUSTER }}
           ecs-service: ${{ env.ECS_SERVICE }}
           docker-tag: ${{ steps.build-push.outputs.docker-tag }}
-      - uses: mbta/actions/notify-slack-deploy@v1
+      - uses: mbta/actions/notify-slack-deploy@f3f7205f8e73dddf983ee234dd93e2b45d3c8a9a # v2.23
         if: ${{ !cancelled() }}
         with:
           webhook-url: ${{ secrets.SLACK_WEBHOOK }}
