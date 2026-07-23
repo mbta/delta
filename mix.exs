@@ -52,7 +52,7 @@ defmodule Delta.MixProject do
       {:configparser_ex, "~> 4.0", only: :dev},
       {:jason, "~> 1.0"},
       {:deep_merge, "~> 1.0"},
-      {:credo, "~> 1.6.4", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.5"},
       {:phoenix_html, "~> 3.0"},
       {:plug_cowboy, "~> 2.2"},
