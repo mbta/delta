@@ -81,24 +81,13 @@ defmodule Delta.Application do
   end
 
   defp process_headers(producer) do
-    if Map.has_key?(producer, "headers") do
-      modified_headers =
-        for {key, raw_value} <- producer["headers"], into: %{} do
-          value =
-            case raw_value do
-              %{"system" => env_var} ->
-                System.get_env(env_var)
-
-              raw_value when is_binary(raw_value) ->
-                raw_value
-            end
-
-          {key, value}
-        end
-
-      %{producer | "headers" => modified_headers}
-    else
-      producer
-    end
+    Map.replace_lazy(
+      producer,
+      "headers",
+      &Map.new(&1, fn {key, raw_value} -> {key, process_header(raw_value)} end)
+    )
   end
+
+  defp process_header(header) when is_binary(header), do: header
+  defp process_header(%{"system" => env_var}), do: System.get_env(env_var)
 end

@@ -85,7 +85,7 @@ defmodule Delta.Producer do
 
       :unknown ->
         _ =
-          Logger.warn(
+          Logger.warning(
             "#{__MODULE__} unexpected message message=#{inspect(message)} state=#{inspect(state)}"
           )
 
@@ -101,7 +101,7 @@ defmodule Delta.Producer do
 
   def handle_error(state, reason) do
     _ =
-      Logger.warn(fn ->
+      Logger.warning(fn ->
         "#{__MODULE__} error fetching url=#{inspect(state.conn.url)} error=#{inspect(reason, limit: :infinity)}"
       end)
 

@@ -1,5 +1,5 @@
 # From https://hub.docker.com/r/hexpm/elixir/tags
-FROM hexpm/elixir:1.14.5-erlang-25.3.2.12-alpine-3.17.7 AS builder
+FROM hexpm/elixir:1.20.2-erlang-29.0.3-alpine-3.24.1 AS builder
 
 WORKDIR /root
 
@@ -27,7 +27,7 @@ ADD . .
 RUN mix do compile, release
 
 # Second stage: copies the files from the builder stage
-FROM alpine:3.17.0
+FROM alpine:3.24.1
 
 RUN apk add --update libssl1.1 ncurses-libs bash dumb-init libstdc++ libgcc \
     && rm -rf /var/cache/apk
