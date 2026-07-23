@@ -5,7 +5,6 @@ defmodule Delta.WebhookProducer do
   alias Delta.File
   alias Delta.Producer.Filter
   use GenStage
-  require Logger
 
   @type opts :: [opt]
   @type opt ::

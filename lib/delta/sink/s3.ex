@@ -46,7 +46,7 @@ defmodule Delta.Sink.S3 do
   defp build_filename(%File{} = file) do
     iso_dt = DateTime.to_iso8601(file.updated_at)
     <<year::binary-4, ?-, month::binary-2, ?-, day::binary-2, _::binary>> = iso_dt
-    encoded_url = String.replace(file.url, ~R/[^A-Za-z0-9._~]+/, "_")
+    encoded_url = String.replace(file.url, ~r/[^A-Za-z0-9._~]+/, "_")
 
     year <>
       "/" <> month <> "/" <> day <> "/" <> iso_dt <> "_" <> encoded_url <> encoding_suffix(file)
@@ -117,7 +117,7 @@ defmodule Delta.Sink.S3 do
           :info
 
         {:error, _} ->
-          :warn
+          :warning
       end
 
     Logger.log(level, fn ->

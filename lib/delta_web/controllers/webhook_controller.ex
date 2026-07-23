@@ -18,7 +18,7 @@ defmodule DeltaWeb.WebhookController do
         send_resp(conn, 200, ~s({"result": "OK"}))
 
       error ->
-        Logger.warn("#{__MODULE__} error processing request error=#{inspect(error)}")
+        Logger.warning("#{__MODULE__} error processing request error=#{inspect(error)}")
         send_resp(conn, 500, ~s({"result": "ERROR"}))
     end
   end

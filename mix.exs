@@ -17,8 +17,13 @@ defmodule Delta.MixProject do
           :unmatched_returns
         ]
       ],
-      test_coverage: [tool: LcovEx],
-      preferred_cli_env: [
+      test_coverage: [tool: LcovEx]
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.html": :test,

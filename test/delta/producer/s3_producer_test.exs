@@ -50,7 +50,7 @@ defmodule Delta.Producer.S3ProducerTest do
     FakeAws.mock_responses([{500, ""}, {200, "body"}])
 
     log =
-      capture_log([level: :warn], fn ->
+      capture_log([level: :warning], fn ->
         assert [%File{body: body}] = take_files(1)
         assert body == :zlib.gzip("body")
       end)

@@ -119,7 +119,7 @@ defmodule Delta.Sink.S3Test do
       config = %{@config | ex_aws: __MODULE__.FakeAwsFailure}
 
       log =
-        capture_log([level: :warn], fn ->
+        capture_log([level: :warning], fn ->
           S3.upload_to_s3(config, @sample_file)
         end)
 
