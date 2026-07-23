@@ -57,42 +57,42 @@ defmodule Delta.Sink.S3 do
 
     case ex_aws.request(S3.head_object(config.bucket, full_filename)) do
       {:ok, %{status_code: 200} = head_response} ->
-        is_same_file?(head_response.headers, file)
+        same_file?(head_response.headers, file)
 
       _ ->
         false
     end
   end
 
-  defp is_same_file?([{"Content-Encoding", encoding} | rest], file) do
+  defp same_file?([{"Content-Encoding", encoding} | rest], file) do
     if content_encoding(file) == encoding do
-      is_same_file?(rest, file)
+      same_file?(rest, file)
     else
       false
     end
   end
 
-  defp is_same_file?([{"Content-Type", type} | rest], file) do
+  defp same_file?([{"Content-Type", type} | rest], file) do
     if content_type(file) == type do
-      is_same_file?(rest, file)
+      same_file?(rest, file)
     else
       false
     end
   end
 
-  defp is_same_file?([{"Content-Length", size_bin} | rest], file) do
+  defp same_file?([{"Content-Length", size_bin} | rest], file) do
     if Integer.to_string(byte_size(file.body)) == size_bin do
-      is_same_file?(rest, file)
+      same_file?(rest, file)
     else
       false
     end
   end
 
-  defp is_same_file?([_ | rest], file) do
-    is_same_file?(rest, file)
+  defp same_file?([_ | rest], file) do
+    same_file?(rest, file)
   end
 
-  defp is_same_file?([], _file) do
+  defp same_file?([], _file) do
     true
   end
 
