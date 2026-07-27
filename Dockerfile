@@ -29,7 +29,7 @@ RUN mix do compile, release
 # Second stage: copies the files from the builder stage
 FROM alpine:3.24.1
 
-RUN apk add --update libssl1.1 ncurses-libs bash dumb-init libstdc++ libgcc \
+RUN apk add --update libssl3 ncurses-libs bash dumb-init libstdc++ libgcc \
     && rm -rf /var/cache/apk
 
 # Set environment
