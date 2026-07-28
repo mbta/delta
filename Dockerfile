@@ -1,5 +1,5 @@
 # From https://hub.docker.com/r/hexpm/elixir/tags
-FROM hexpm/elixir:1.20.2-erlang-29.0.3-alpine-3.24.1 AS builder
+FROM hexpm/elixir:1.20.2-erlang-29.0.4-alpine-3.24.1 AS builder
 
 WORKDIR /root
 
