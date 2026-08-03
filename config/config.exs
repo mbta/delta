@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :delta,
   default_content_type: "application/octet-stream",
