@@ -19,7 +19,7 @@ defmodule Delta.Producer.Hackney do
 
   @impl Delta.Producer.HTTP
   def fetch(conn) do
-    case Req.get(conn.url, headers: conn.headers) do
+    case Req.get(conn.url, headers: conn.headers, retry: false) do
       {:ok, %Req.Response{status: 200, headers: headers, body: body}} ->
         maybe_file(conn, headers, body)
 
