@@ -6,6 +6,14 @@ is_release? = not is_nil(System.get_env("RELEASE_MODE"))
 if is_prod? and is_release? do
   sentry_env = System.get_env("SENTRY_ENV")
 
+  secret_key_base = System.get_env("SECRET_KEY_BASE")
+
+  if !secret_key_base do
+    raise "No SECRET_KEY_BASE ENV var!"
+  end
+
+  config :secret_key_base, secret_key_base
+
   if not is_nil(sentry_env) do
     config :sentry,
       filter: DeltaWeb.SentryEventFilter,
