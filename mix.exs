@@ -65,7 +65,7 @@ defmodule Delta.MixProject do
       {:bypass, "~> 2.0", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod},
       {:finch, "~> 0.24"},
-      {:sentry, "~> 8.0"},
+      {:sentry, "~> 10.0"},
       {:req, "~> 0.7.5"}
     ]
   end
