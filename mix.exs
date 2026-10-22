@@ -7,7 +7,6 @@ defmodule Delta.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases(),
@@ -59,13 +58,14 @@ defmodule Delta.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.5"},
       {:phoenix_html, "~> 3.0"},
+      {:phoenix_view, "~> 2.0"},
       {:plug_cowboy, "~> 2.2"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
       {:bypass, "~> 2.0", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod},
       {:finch, "~> 0.24"},
-      {:sentry, "~> 10.0"},
+      {:sentry, "~> 14.0"},
       {:req, "~> 0.7.5"}
     ]
   end
