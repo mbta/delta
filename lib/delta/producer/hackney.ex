@@ -4,15 +4,11 @@ defmodule Delta.Producer.Hackney do
   """
   @behaviour Delta.Producer.HTTP
   @default_headers [
-    {"accept-encoding", "gzip"}
+    {"accept-encoding", ["gzip"]}
   ]
   defstruct [
     :url,
     headers: @default_headers
-  ]
-
-  @hackney_opts [
-    follow_redirects: true
   ]
 
   @impl Delta.Producer.HTTP
@@ -23,21 +19,19 @@ defmodule Delta.Producer.Hackney do
 
   @impl Delta.Producer.HTTP
   def fetch(conn) do
-    case :hackney.request(:get, conn.url, conn.headers, [], @hackney_opts) do
-      {:ok, 200, headers, ref} ->
-        maybe_file(conn, headers, ref)
+    case Req.get(conn.url, headers: conn.headers, retry: false) do
+      {:ok, %Req.Response{status: 200, headers: headers, body: body}} ->
+        maybe_file(conn, headers, body)
 
-      {:ok, 304, headers, ref} ->
-        _ = :hackney.body(ref)
+      {:ok, %Req.Response{status: 304, headers: headers}} ->
         conn = update_cache_headers(conn, headers)
         {:unmodified, conn}
 
-      {:ok, status, _headers, ref} ->
-        body = :hackney.body(ref)
+      {:ok, %Req.Response{status: status, body: body}} ->
         {:error, conn, {:invalid_status, status, body}}
 
-      {:error, reason} ->
-        {:error, conn, reason}
+      {:error, exception} ->
+        {:error, conn, inspect(exception)}
     end
   end
 
@@ -50,32 +44,20 @@ defmodule Delta.Producer.Hackney do
     :unknown
   end
 
-  defp maybe_file(conn, headers, ref) do
+  defp maybe_file(conn, headers, body) do
     new_conn = update_cache_headers(conn, headers)
 
     if modified_cache_headers?(new_conn.headers, conn.headers) do
-      maybe_file_with_body(new_conn, headers, :hackney.body(ref))
+      {:ok, new_conn, build_file(new_conn, headers, body)}
     else
-      _ = :hackney.body(ref)
       {:unmodified, new_conn}
     end
   end
 
   defp modified_cache_headers?(new_headers, old_headers) do
-    # only check if the ETag header changed. We don't consider the
     # Last-Modified time (accurate to the second) good enoough.
     List.keyfind(new_headers, "if-none-match", 0, :new) !=
       List.keyfind(old_headers, "if-none-match", 0, :old)
-  end
-
-  @doc false
-  # only public to allow unit testing. I couldn't reproduce this with Bypass. -ps
-  def maybe_file_with_body(conn, headers, {:ok, body}) do
-    {:ok, conn, build_file(conn, headers, body)}
-  end
-
-  def maybe_file_with_body(conn, _headers, {:error, reason}) do
-    {:error, conn, reason}
   end
 
   defp build_file(state, headers, body) do
@@ -99,9 +81,12 @@ defmodule Delta.Producer.Hackney do
   end
 
   defp find_header(headers, header) do
-    Enum.find_value(headers, fn {key, value} ->
-      String.downcase(key) == header and value
-    end)
+    case Enum.find_value(headers, fn {key, value} ->
+           String.downcase(key) == header and value
+         end) do
+      nil -> nil
+      [value] -> value
+    end
   end
 
   defp update_cache_headers(conn, headers) do
@@ -129,7 +114,10 @@ defmodule Delta.Producer.Hackney do
   end
 
   defp best_datetime(headers) do
-    Enum.reduce_while(headers, nil, &best_datetime_header/2)
+    case Enum.reduce_while(headers, nil, &best_datetime_header/2) do
+      [dt] -> dt
+      _ -> DateTime.new!(~D[1970-01-01], ~T[00:00:00], "Etc/UTC")
+    end
   end
 
   defp best_datetime_header({key, value}, acc) do

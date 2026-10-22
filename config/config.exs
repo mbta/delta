@@ -18,7 +18,8 @@ config :delta, DeltaWeb.Router, require_https?: false
 config :logger, level: :info
 
 config :ex_aws,
-  json_codec: Jason
+  json_codec: Jason,
+  http_client: ExAws.Request.Req
 
 config :phoenix, :json_library, Jason
 

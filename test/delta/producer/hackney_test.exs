@@ -111,13 +111,4 @@ defmodule Delta.Producer.HackneyTest do
       assert :unknown = Hackney.stream(conn, :other_message)
     end
   end
-
-  describe "maybe_file_with_body" do
-    test "returns an error when the body cannot be read" do
-      {:ok, conn} = Hackney.new(url: "https://www.mbta.com/")
-
-      assert {:error, ^conn, :timeout} =
-               Hackney.maybe_file_with_body(conn, [], {:error, :timeout})
-    end
-  end
 end
