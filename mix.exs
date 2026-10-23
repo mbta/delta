@@ -64,7 +64,6 @@ defmodule Delta.MixProject do
       {:dialyxir, "~> 1.4.0", only: [:dev], runtime: false},
       {:bypass, "~> 2.0", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod},
-      {:finch, "~> 0.24"},
       {:sentry, "~> 14.0"},
       {:req, "~> 0.7.5"}
     ]
