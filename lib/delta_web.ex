@@ -19,7 +19,7 @@ defmodule DeltaWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: DeltaWeb
+      use Phoenix.Controller, formats: [html: "View", json: "View"]
 
       import Plug.Conn
       alias DeltaWeb.Router.Helpers, as: Routes

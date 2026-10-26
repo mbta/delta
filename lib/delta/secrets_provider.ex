@@ -6,7 +6,7 @@ defmodule Delta.SecretsProvider do
   @behaviour Config.Provider
   @application_requirements [
     :ex_aws_secretsmanager,
-    :hackney
+    :finch
   ]
 
   @type config :: Config.Provider.config()
