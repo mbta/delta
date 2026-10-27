@@ -48,7 +48,8 @@ defmodule Delta.MixProject do
       # this can go back to a release once this commit is in a release -ps
       {:gen_stage,
        github: "elixir-lang/gen_stage", ref: "7143c04d32cebeaf2bd743c6eb876ef05f903277"},
-      {:ex_aws, "~> 2.1"},
+      {:req, "~> 0.7.5"},
+      {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws_secretsmanager, "~> 2.0"},
       # used by ex_aws to parse AWS CLI settings/credentials
@@ -64,8 +65,7 @@ defmodule Delta.MixProject do
       {:dialyxir, "~> 1.4.0", only: [:dev], runtime: false},
       {:bypass, "~> 2.0", only: :test},
       {:ehmon, git: "https://github.com/mbta/ehmon.git", branch: "master", only: :prod},
-      {:sentry, "~> 14.0"},
-      {:req, "~> 0.7.5"}
+      {:sentry, "~> 14.0"}
     ]
   end
 

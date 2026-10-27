@@ -1,33 +1,27 @@
 import Config
 
-is_prod? = config_env() == :prod
-is_release? = not is_nil(System.get_env("RELEASE_MODE"))
+secret_key_base = System.get_env("SECRET_KEY_BASE")
 
-if is_prod? and is_release? do
-  sentry_env = System.get_env("SENTRY_ENV")
+if secret_key_base do
+  config DeltaWeb.Endpoint,
+    secret_key_base: secret_key_base
+end
 
-  secret_key_base = System.get_env("SECRET_KEY_BASE")
+sentry_env = System.get_env("SENTRY_ENV")
 
-  if !secret_key_base do
-    raise "No SECRET_KEY_BASE ENV var!"
-  end
+if not is_nil(sentry_env) do
+  config :sentry,
+    filter: DeltaWeb.SentryEventFilter,
+    dsn: System.fetch_env!("SENTRY_DSN"),
+    environment_name: sentry_env,
+    enable_source_code_context: true,
+    root_source_code_path: File.cwd!(),
+    tags: %{
+      env: sentry_env
+    },
+    included_environments: [sentry_env]
 
-  config :secret_key_base, secret_key_base
-
-  if not is_nil(sentry_env) do
-    config :sentry,
-      filter: DeltaWeb.SentryEventFilter,
-      dsn: System.fetch_env!("SENTRY_DSN"),
-      environment_name: sentry_env,
-      enable_source_code_context: true,
-      root_source_code_path: File.cwd!(),
-      tags: %{
-        env: sentry_env
-      },
-      included_environments: [sentry_env]
-
-    config :logger, Sentry.LoggerBackend,
-      level: :error,
-      capture_log_messages: true
-  end
+  config :logger, Sentry.LoggerBackend,
+    level: :error,
+    capture_log_messages: true
 end
